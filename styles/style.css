@@ -74,20 +74,25 @@ button {
     padding: 8px;
     text-align: center;
     word-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
 }
 
-/* Ensure the rendered matrix container is responsive */
 .render-area {
-    width: 100%;
-    margin-top: 20px;
+    max-width: 100%; /* Allow the area to use the full width of the container */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    border: 1px solid #ddd; /* Optional: border around the render area */
+    padding: 10px;
+    white-space: nowrap; /* Prevent the content from wrapping to new lines */
 }
 
 #matrix-render {
-    width: 100%;
-    overflow: hidden; /* Prevent overflow */
-    text-align: center;
+    display: inline-block; /* Prevent the matrix from shrinking */
+    width: auto; /* Ensure the matrix takes up as much width as it needs */
+    min-width: 100%; /* Ensure the matrix render doesn't shrink below the container's width */
 }
+
 
 @media (max-width: 768px) {
     .controls {
