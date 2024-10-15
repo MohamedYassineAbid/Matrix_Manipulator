@@ -3,6 +3,8 @@ import streamlit as st
 import pandas as pd
 import algorithmes
 
+
+
 def matrix_to_latex(matrix):
     latex_str = "\\begin{bmatrix}"
     for row in matrix:
@@ -32,8 +34,8 @@ def apply_algorithm(matrix, algorithm):
 
 st.title("Matrix Input with File Upload and Algorithms")
 st.sidebar.header("Matrix Settings")
-rows = st.sidebar.number_input("Number of Rows", min_value=1, max_value=5, value=3)
-cols = st.sidebar.number_input("Number of Columns", min_value=1, max_value=5, value=3)
+rows = st.sidebar.number_input("Number of Rows", min_value=1, max_value=10, value=3)
+cols = st.sidebar.number_input("Number of Columns", min_value=1, max_value=10, value=3)
 
 st.sidebar.header("Matrix Operations")
 algorithm = st.sidebar.selectbox("Choose an algorithm", ["None", "cholesky", "Transpose", "Determinant", "Inverse"])
