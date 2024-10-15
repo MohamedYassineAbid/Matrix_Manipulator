@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "matrix-manipulator"
+version = "0.1.0"
+description = "Cholesky decomposition calculator"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^2.1.2"
+pandas = "^2.2.3"
+streamlit = "^1.39.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
