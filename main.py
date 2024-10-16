@@ -14,6 +14,7 @@ parent_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(parent_dir, "logo.svg")
 urls = {"GitHub": "https://github.com/MohamedAliJmal/Matrix_Manipulator"}
 styles = {
+    
     "nav": {
         "background-color": "royalblue",
         "justify-content": "left",
@@ -27,11 +28,13 @@ styles = {
     },
     "active": {
         "background-color": "white",
-        "color": "var(--text-color)",
+        "color": "black",
         "font-weight": "normal",
         "padding": "14px",
     }
 }
+
+
 
 
 page = st_navbar(
