@@ -1,7 +1,11 @@
+
+
+
 import streamlit as st
 import algorithmes
 import pandas as pd
 import numpy as np
+import time
 
 
 def matrix_to_latex(matrix):
@@ -34,6 +38,7 @@ def apply_algorithm(matrix, algorithm):
 
 
 def show_home():
+   
     st.title("Matrix Input with File Upload and Algorithms")
     st.sidebar.header("Matrix Settings")
     rows = st.sidebar.number_input("Number of Rows", min_value=1, max_value=10, value=3)

@@ -1,23 +1,22 @@
 import streamlit as st
 from streamlit_navigation_bar import st_navbar
 import os
-import pages as pg
+import pagess
 
 
 
 
-
-st.set_page_config(initial_sidebar_state="collapsed")
-
-pages = ["Home", "User Guide", "API", "Examples", "GitHub"]
+    
+pages = ["Home", "User Guide", "API", "Examples", "GitHub","Account"]
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(parent_dir, "logo.svg")
 urls = {"GitHub": "https://github.com/MohamedAliJmal/Matrix_Manipulator"}
 styles = {
-    
+     
     "nav": {
         "background-color": "royalblue",
-        "justify-content": "left",
+        
+        
     },
     "img": {
         "padding-right": "14px",
@@ -25,6 +24,7 @@ styles = {
     "span": {
         "color": "white",
         "padding": "14px",
+        
     },
     "active": {
         "background-color": "white",
@@ -36,21 +36,23 @@ styles = {
 
 
 
-
 page = st_navbar(
     pages,
     logo_path=logo_path,
     urls=urls,
-    styles=styles,  
+    styles=styles, 
 )
 
 functions = {
-    "Home": pg.show_home,
-    "User Guide": pg.show_user_guide,
-    "API": pg.show_api,
-    "Examples": pg.show_examples,
-    "Account": pg.show_account,
+    "Home": pagess.show_home,
+    "User Guide": pagess.show_user_guide,
+    "API": pagess.show_api,
+    "Examples": pagess.show_examples,
+    "Account": pagess.show_account,
+    
 }
+
+
 go_to = functions.get(page)
 if go_to:
     go_to()
