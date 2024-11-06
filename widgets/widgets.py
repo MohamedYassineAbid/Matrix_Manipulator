@@ -254,6 +254,7 @@ class __login__:
         """
         Creates the side navigaton bar
         """
+        
         main_page_sidebar = st.sidebar.empty()
         with main_page_sidebar:
             selected_option = option_menu(
@@ -337,18 +338,22 @@ class __login__:
             #         #self.animation()
             #         pass
             # with c1:
-                
+            
             self.login_widget()
+            
                     
         
         if selected_option == 'Create Account':
             self.sign_up_widget()
+            
 
         if selected_option == 'Forgot Password?':
             self.forgot_password()
+            
 
         if selected_option == 'Reset Password':
             self.reset_password()
+            
         
         
 
