@@ -9,12 +9,12 @@ import pagess
     
 pages = ["Home", "User Guide", "API", "Examples", "GitHub","Account"]
 parent_dir = os.path.dirname(os.path.abspath(__file__))
-logo_path = os.path.join(parent_dir, "logo.svg")
+logo_path = os.path.join(parent_dir, "assets/logo/logo.svg")
 urls = {"GitHub": "https://github.com/MohamedAliJmal/Matrix_Manipulator"}
 styles = {
      
     "nav": {
-        "background-color": "royalblue",
+        "background-color": "#4169e1",
         
         
     },
@@ -42,6 +42,8 @@ page = st_navbar(
     urls=urls,
     styles=styles, 
 )
+
+
 
 functions = {
     "Home": pagess.show_home,

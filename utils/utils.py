@@ -166,7 +166,7 @@ def generate_random_passwd() -> str:
     return secrets.token_urlsafe(password_length)
 
 
-def send_passwd_in_email(auth_token: str, username_forgot_passwd: str, email_forgot_passwd: str, company_name: str, random_password: str) -> None:
+def send_passwd_in_email(auth_token: str, username_forgot_passwd: str, email_forgot_passwd: str, random_password: str) -> None:
     """
     Triggers an email to the user containing the randomly generated password.
     """
@@ -178,7 +178,7 @@ def send_passwd_in_email(auth_token: str, username_forgot_passwd: str, email_for
         "email": email_forgot_passwd
         },
         "content": {
-        "title": company_name + ": Login Password!",
+        "title": ": Login Password!",
         "body": "Hi! " + username_forgot_passwd + "," + "\n" + "\n" + "Your temporary login password is: " + random_password  + "\n" + "\n" + "{{info}}"
         },
         "data":{

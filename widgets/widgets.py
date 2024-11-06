@@ -4,18 +4,18 @@ import os
 from streamlit_lottie import st_lottie
 from streamlit_option_menu import option_menu
 from streamlit_cookies_manager import EncryptedCookieManager
-from .utils import check_usr_pass
-from .utils import load_lottieurl
-from .utils import check_valid_name
-from .utils import check_valid_email
-from .utils import check_unique_email
-from .utils import check_unique_usr
-from .utils import register_new_usr
-from .utils import check_email_exists
-from .utils import generate_random_passwd
-from .utils import send_passwd_in_email
-from .utils import change_passwd
-from .utils import check_current_passwd
+from   utils.utils import check_usr_pass
+#from   utils.utils import load_lottieurl
+from   utils.utils import check_valid_name
+from   utils.utils import check_valid_email
+from   utils.utils import check_unique_email
+from   utils.utils import check_unique_usr
+from   utils.utils import register_new_usr
+from   utils.utils import check_email_exists
+from   utils.utils import generate_random_passwd
+from   utils.utils import send_passwd_in_email
+from   utils.utils import change_passwd
+from   utils.utils import check_current_passwd
 
 
 class __login__:
@@ -23,7 +23,7 @@ class __login__:
     Builds the UI for the Login/ Sign Up page.
     """
 
-    def __init__(self, auth_token: str, company_name: str, width, height, logout_button_name: str = 'Logout', hide_menu_bool: bool = False, hide_footer_bool: bool = False, lottie_url: str = "https://assets8.lottiefiles.com/packages/lf20_ktwnwv5m.json" ):
+    def __init__(self, auth_token: str,  width, height, logout_button_name: str = 'Logout', hide_menu_bool: bool = False, hide_footer_bool: bool = False, lottie_url: str = "https://assets8.lottiefiles.com/packages/lf20_ktwnwv5m.json" ):
         """
         Arguments:
         -----------
@@ -38,7 +38,7 @@ class __login__:
         9. lottie_url : The lottie animation you would like to use on the login page. Explore animations at - https://lottiefiles.com/featured
         """
         self.auth_token = auth_token
-        self.company_name = company_name
+       
         self.width = width
         self.height = height
         self.logout_button_name = logout_button_name
@@ -61,8 +61,8 @@ class __login__:
         Checks if the auth file (where the user info is stored) already exists.
         """
         file_names = []
-        for path in os.listdir('./'):
-            if os.path.isfile(os.path.join('./', path)):
+        for path in os.listdir('assets/token'):
+            if os.path.isfile(os.path.join('./assets/token', path)):
                 file_names.append(path)
 
         present_files = []
@@ -193,7 +193,7 @@ class __login__:
 
                 if email_exists_check == True:
                     random_password = generate_random_passwd()
-                    send_passwd_in_email(self.auth_token, username_forgot_passwd, email_forgot_passwd, self.company_name, random_password)
+                    send_passwd_in_email(self.auth_token, username_forgot_passwd, email_forgot_passwd,random_password)
                     change_passwd(email_forgot_passwd, random_password)
                     st.success("Secure Password Sent Successfully!")
 
@@ -283,29 +283,29 @@ class __login__:
 
     
 
-    def hide_menu(self) -> None:
-        """
-        Hides the streamlit menu situated in the top right.
-        """
-        st.markdown(""" <style>
-        #MainMenu {visibility: hidden;},
+    # def hide_menu(self) -> None:
+    #     """
+    #     Hides the streamlit menu situated in the top right.
+    #     """
+    #     st.markdown(""" <style>
+    #     #MainMenu {visibility: hidden;},
         
                     
-        </style> """, unsafe_allow_html=True)
+    #     </style> """, unsafe_allow_html=True)
 
     
 
-    def hide_footer(self) -> None:
-        """
-        Hides the 'made with streamlit' footer.
-        """
-        st.markdown(""" <style>
-        footer {visibility: hidden;}
-        </style> """, unsafe_allow_html=True)
+    # def hide_footer(self) -> None:
+    #     """
+    #     Hides the 'made with streamlit' footer.
+    #     """
+    #     st.markdown(""" <style>
+    #     footer {visibility: hidden;}
+    #     </style> """, unsafe_allow_html=True)
 
-        st.markdown(""" <style>            
-        header {visibility: hidden, width : 0, height:0;}
-        </style> """, unsafe_allow_html=True)
+    #     st.markdown(""" <style>            
+    #     header {visibility: hidden, width : 0, height:0;}
+    #     </style> """, unsafe_allow_html=True)
 
     def build_login_ui(self):
 
@@ -321,11 +321,11 @@ class __login__:
         auth_json_exists_bool = self.check_auth_json_file_exists('_secret_auth_.json')
 
         if auth_json_exists_bool == False:
-            with open("_secret_auth_.json", "w") as auth_json:
+            with open("assets/token/_secret_auth_.json", "w") as auth_json:
                 json.dump([], auth_json)
 
         
-        
+        #self.hide_footer()
         main_page_sidebar, selected_option = self.nav_sidebar()
 
         if selected_option == 'Login':
@@ -359,7 +359,7 @@ class __login__:
         #     self.hide_menu()
         
         # if self.hide_footer_bool == True:
-        #     self.hide_footer()
+        
         
         return st.session_state['LOGGED_IN']
        
