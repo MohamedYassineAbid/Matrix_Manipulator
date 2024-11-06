@@ -96,19 +96,12 @@ def Determinant(matrix):
     return np.round(np.linalg.det(matrix),2)
 
 def Inverse(matrix):
-    return ((np.round(np.linalg.inv(matrix),2))) if np.linalg.det(matrix) != 0 else ("Matrix is singular!")
+    return (np.linalg.inv(matrix), [], []) if np.linalg.det(matrix) != 0 else ("Matrix is singular!", [], [])
 
-#Produit de deux matrices
-def produit(A, B):
-    return [[sum(L[k] * B[k][j] for k in range(len(L))) for j in range(len(B[0]))] for L in A]
+def transposer(matrix):
+    return matrix.T, [], []
 
-#Addition de deux matrices
-def addition(A, B):
-    return [[A[i][j] + B[i][j] for j in range(len(A[0]))] for i in range(len(A))]
 
-#CHECK IF THE MATRIX IS SYMMETRIC
-def isSymmetric(matrix):
-    return (matrix == matrix.T).all()
 
 #check if the matrix is square
 def isSquare(matrix):

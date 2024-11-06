@@ -1,16 +1,19 @@
 import streamlit as st
-from pagess.widgets import __login__
+from widgets.widgets import __login__
+
+
+
 def show_account():
     
 
     __login__obj = __login__(auth_token = "courier_auth_token",
-                    company_name = "Shims",
                     width = 200, height = 250,
                     logout_button_name = 'Logout', hide_menu_bool = False,
                     hide_footer_bool = False,
                     )
 
     LOGGED_IN= __login__obj.build_login_ui()
+    
     username= __login__obj.get_username()
     
 
