@@ -1,4 +1,5 @@
 from math import *
+import random
 import numpy as np
 
 # Cholesky decomposition algorithm
@@ -44,10 +45,17 @@ type_mapping = {
 }
 
 # Generate a symmetric matrix with specified value range
+
 def generate_symmetric_matrix(n, element_type, min_val, max_val):
-    random_matrix = np.random.uniform(min_val, max_val, (n, n))
-    symmetric_matrix = random_matrix + Transpose(random_matrix)
-    return np.round(symmetric_matrix, 2).astype(type_mapping[element_type])
+    matrix = np.zeros((n, n))
+
+    for i in range(n):
+        for j in range(i, n):
+            random_value = random.randint(min_val, max_val)
+            matrix[i][j]= random_value
+            matrix[j][i]=random_value
+
+    return np.round(matrix.astype(type_mapping[element_type]),2)
 
 #Genetate a positive definite matrix
 def generate_positive_definite_matrix(n, element_type, min_val=0, max_val=10):
@@ -80,7 +88,14 @@ def generate_band_matrix(n,element_type, lower_bandwidth, upper_bandwidth, low=0
         for j in range(max(0, i - lower_bandwidth), min(n, i + upper_bandwidth + 1)):
             A[i, j] = float(np.round(np.random.uniform(low, high), 2))
             
-    return A
+    return A.astype(type_mapping[element_type])
+
+
+################################################################################
+################################################################################
+################################################################################
+
+
 # Matrix Minor
 def getMatrixMinor(m, p):
      if (p>1) : return [row[:p] + row[p + 1:] for row in (m[:p] + m[p + 1:])]
@@ -88,20 +103,18 @@ def getMatrixMinor(m, p):
 def is_positive_definite(matrix):
     return np.all(np.linalg.eigvals(matrix) > 0)
 
-    
-def Transpose(matrix):
-    return matrix.T
 
 def Determinant(matrix):
     return np.round(np.linalg.det(matrix),2)
 
 def Inverse(matrix):
-    return (np.linalg.inv(matrix), [], []) if np.linalg.det(matrix) != 0 else ("Matrix is singular!", [], [])
+    return (np.linalg.inv(matrix)) if np.linalg.det(matrix) != 0 else ("Matrix is singular!")
 
 def transposer(matrix):
-    return matrix.T, [], []
+    return matrix.T 
 
-
+def isSymmetric(matrix):
+    return np.all(matrix==matrix.T)
 
 #check if the matrix is square
 def isSquare(matrix):

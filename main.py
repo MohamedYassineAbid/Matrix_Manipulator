@@ -4,7 +4,6 @@ from streamlit_navigation_bar import st_navbar
 import os
 
 
-
 pages = ["Home", "User Guide", "API", "Examples", "GitHub","Account"]
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(parent_dir, "assets/logo/logo.svg")
