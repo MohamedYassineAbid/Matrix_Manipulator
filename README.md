@@ -35,7 +35,10 @@ If Poetry is not already installed, follow these steps to install it:
 
 1. Run the following command to download and install Poetry:
    ```bash
-   curl -sSL https://install.python-poetry.org | python3 -
+   sudo apt install python3-pip -y
+   ```
+    ```bash
+   pip install poetry
    ```
 2. Add Poetry to your PATH if necessary by following [these instructions](https://python-poetry.org/docs/#installation).
 
