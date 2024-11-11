@@ -108,7 +108,7 @@ def Determinant(matrix):
     return np.round(np.linalg.det(matrix),2)
 
 def Inverse(matrix):
-    return (np.linalg.inv(matrix)) if np.linalg.det(matrix) != 0 else ("Matrix is singular!")
+    return (np.linalg.inv(matrix)) if np.linalg.det(matrix) != 0 else ("Det(M) = 0, M is not invertible")
 
 def transposer(matrix):
     return matrix.T 

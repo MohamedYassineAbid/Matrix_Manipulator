@@ -1,4 +1,5 @@
 from enum import Enum
+import time
 import streamlit as st
 import algorithmes
 import pandas as pd
@@ -20,9 +21,10 @@ class AlgorithmType(Enum):
     POSITIVITY = "Positivity"
 
 class InputType(Enum):
+    MANUAL_INPUT = "Manual Input"
     RANDOM = "Random"
     CSV_UPLOAD = "CSV Upload"
-    MANUAL_INPUT = "Manual Input"
+    
     
     
 # Convert a matrix to LaTeX format
@@ -42,9 +44,21 @@ def save_matrix_to_csv(matrix):
     else:
         st.error("Matrix is not in a valid 2D format.")
         return None
+# function to display the download button for the CSV file
+def matrix_download_button(result):
+    csv_file = save_matrix_to_csv(np.round(result, 2))
+    if csv_file:
+        st.download_button(
+            label="Download Processed Matrix",
+            data=csv_file,
+            file_name="processed_matrix.csv",
+            mime="text/csv"
+        )
 
-
+###### 
 # Apply the chosen algorithm on the matrix
+# remove [],[] from the return of the function if the function possed steps and descriptions
+######
 def apply_algorithm(matrix, algorithm):
     if algorithm == AlgorithmType.TRANSPOSE.value:
         return algorithmes.transposer(matrix), [], []
@@ -98,17 +112,17 @@ def show_home():
         st.session_state.input_type = None
         st.session_state.algorithm = None
         st.session_state.generate_button = False  
-        st.experimental_rerun()
+        st.rerun()
 
     
     # Matrix input type selection
     input_type = st.sidebar.radio("Select Matrix Input Type", typeOfInput)
-    if st.session_state.input_type == InputType.CSV_UPLOAD.value and input_type != InputType.CSV_UPLOAD.value:
-        st.session_state.matrix = None  #
+    if (st.session_state.input_type == InputType.CSV_UPLOAD.value and input_type != InputType.CSV_UPLOAD.value) or (st.session_state.input_type == InputType.RANDOM.value and input_type != InputType.RANDOM.value) or (st.session_state.input_type == InputType.MANUAL_INPUT.value and input_type != InputType.MANUAL_INPUT.value):
+        st.session_state.matrix = None  
 
     st.session_state.input_type = input_type
-    # Matrix type selection and generation if "Random" is selected
     if input_type == InputType.RANDOM.value:
+        
         typeOfMatrix = [matrix_type.value for matrix_type in MatrixType]
         element_type = st.sidebar.radio("Select Element Type", ["int", "float"])
         matrix_type = st.sidebar.selectbox("Select Matrix Type", typeOfMatrix)
@@ -126,18 +140,21 @@ def show_home():
             generate_button = st.sidebar.button("Generate Matrix")
 
         if generate_button:
-                if matrix_type == MatrixType.SQUARE.value:
-                    st.session_state.matrix = algorithmes.generate_square_matrix(rows, element_type, min_val, max_val)
-                elif matrix_type == MatrixType.SYMMETRIC.value and yesorno=="No":
-                    st.session_state.matrix = algorithmes.generate_symmetric_matrix(rows, element_type, min_val, max_val)
-                elif matrix_type == MatrixType.SYMMETRIC.value and yesorno=="Yes":
-                    st.session_state.matrix = algorithmes.generate_positive_definite_matrix(rows, element_type, min_val, max_val)
-                elif matrix_type == MatrixType.DIAGONAL.value:
-                    st.session_state.matrix = algorithmes.generate_diagonal_matrix(rows, element_type, min_val, max_val)
-                elif matrix_type == MatrixType.BAND.value:
-                    st.session_state.matrix = algorithmes.generate_band_matrix(rows, element_type, lower_bandwidth, upper_bandwidth, min_val, max_val)
-                elif matrix_type == MatrixType.IDENTITY.value:
-                    st.session_state.matrix = algorithmes.generate_identity_matrix(rows)
+            if matrix_type == MatrixType.SQUARE.value:
+                st.session_state.matrix = algorithmes.generate_square_matrix(rows, element_type, min_val, max_val)
+            elif matrix_type == MatrixType.SYMMETRIC.value and yesorno=="No":
+                st.session_state.matrix = algorithmes.generate_symmetric_matrix(rows, element_type, min_val, max_val)
+            elif matrix_type == MatrixType.SYMMETRIC.value and yesorno=="Yes":
+                st.session_state.matrix = algorithmes.generate_positive_definite_matrix(rows, element_type, min_val, max_val)
+            elif matrix_type == MatrixType.DIAGONAL.value:
+                st.session_state.matrix = algorithmes.generate_diagonal_matrix(rows, element_type, min_val, max_val)
+            elif matrix_type == MatrixType.BAND.value:
+                st.session_state.matrix = algorithmes.generate_band_matrix(rows, element_type, lower_bandwidth, upper_bandwidth, min_val, max_val)
+            elif matrix_type == MatrixType.IDENTITY.value:
+                st.session_state.matrix = algorithmes.generate_identity_matrix(rows)
+        if st.session_state.matrix is None:
+            st.write("### Waiting for matrix generation...")
+                
 
 
     elif input_type == InputType.CSV_UPLOAD.value:
@@ -161,8 +178,10 @@ def show_home():
         for i in range(rows):
             cols_input = st.columns(cols)
             for j in range(cols):
-                st.session_state.matrix[i][j] = float(cols_input[j].text_input(f"Row {i + 1}, Col {j + 1}", value="0"))
-
+                cell_key = f"manual_cell_{i}_{j}"
+                if cell_key not in st.session_state:
+                    st.session_state[cell_key] = "0.0"  
+                st.session_state.matrix[i][j] = float(cols_input[j].text_input(f"## M[{i + 1}][{j + 1}]",value=st.session_state[cell_key],key=cell_key))
 
     # Matrix operation selection, always visible
     st.sidebar.header("Matrix Operations")
@@ -177,15 +196,13 @@ def show_home():
             
             if isinstance(result, np.ndarray):
                 csv_file = save_matrix_to_csv(result)
+                
                 if csv_file:
-                    st.download_button(
-                        label="Download Processed Matrix",
-                        data=csv_file,
-                        file_name="processed_matrix.csv",
-                        mime="text/csv"
-                    )
+                    st.write(f"### Result of {algorithm}:")
+                    st.dataframe(pd.DataFrame(result))
+                    matrix_download_button(result)
             else:
-                st.write(f"#### {result}")  
+                st.write(f"#### {result}") 
 
     
     
@@ -197,17 +214,23 @@ def show_home():
 
         # Apply selected algorithm and display results
         if algorithm != AlgorithmType.NONE.value:
-            st.write(f"### Result of {algorithm}:")
             result, steps, descriptions = apply_algorithm(st.session_state.matrix, algorithm)
-            if result is not None:
+
+            if result is not None and (steps is  None  or len(steps)==0 ) and (descriptions is  None or len(descriptions)==0):
+                st.write(f"### Result of {algorithm}:")
                 if isinstance(result, np.ndarray):
                     st.latex(matrix_to_latex(result)) 
+                    matrix_download_button(result)
                 else:
                     st.write(f"#### {result}") 
 
-                # Display additional information for Cholesky
-                if algorithm == AlgorithmType.CHOLESKY.value and isinstance(result, np.ndarray):
-                    st.write("### Steps of Cholesky Decomposition:")
+            else :
+                
+                if  isinstance(result, np.ndarray):
+                    st.write(f"### Steps of {algorithm}:")
                     for step, description in zip(steps, descriptions):
                         st.write(description)
-                        st.latex(matrix_to_latex(step))  
+                        st.latex(matrix_to_latex(step))
+                    st.write(f"### Result of {algorithm}:")
+                    st.latex(matrix_to_latex(result)) 
+                    matrix_download_button(result) 
