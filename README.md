@@ -57,9 +57,9 @@ If Poetry is not already installed, follow these steps to install it:
    poetry env info --path
    ```
       - Open your project in VS Code.
-      - Press Ctrl+Shift+P (or Cmd+Shift+P on macOS) to open the Command Palette.
+      - Press **Ctrl+Shift+P** (or **Cmd+Shift+P on macOS**) to open the Command Palette.
       - Search for and select Python: Select Interpreter.
-      - Select #Enter #Intrepreter #Path
+      - Select **Enter Intrepreter Path**
       - Paste  the command output
 ### Step 4: Run the Application
 
