@@ -2,6 +2,7 @@ import streamlit as st
 
 
 def show_user_guide():
+
     st.header("User guide")
     st.write(
         """
