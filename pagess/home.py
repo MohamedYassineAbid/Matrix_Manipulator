@@ -250,6 +250,7 @@ def show_home():
                     cols_input[j].text_input(f"Row {i + 1}, Col {j + 1}", value="0")
                 )
 
+
     # Matrix operation selection, always visible
     st.sidebar.header("Matrix Operations")
     algorithm_type = [algorithm.value for algorithm in AlgorithmType]
