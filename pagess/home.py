@@ -1,9 +1,13 @@
 from enum import Enum
+import os
+import time
 import streamlit as st
 import algorithmes
 import pandas as pd
 import numpy as np
-
+from streamlit_chat import message
+import creds
+import google.generativeai as genai
 
 class MatrixType(Enum):
     SQUARE = "Square"
@@ -23,10 +27,10 @@ class AlgorithmType(Enum):
 
 
 class InputType(Enum):
+    MANUAL_INPUT = "Manual Input"
     RANDOM = "Random"
     CSV_UPLOAD = "CSV Upload"
-    MANUAL_INPUT = "Manual Input"
-
+    
 
 # Convert a matrix to LaTeX format
 def matrix_to_latex(matrix):
@@ -96,10 +100,44 @@ def clear_matrix():
     if "matrix" in st.session_state:
         del st.session_state.matrix
 
+my_api_key = creds.api_key2
 
+genai.configure(api_key=my_api_key)
+def get_gemini_response(user_input):
+    try:
+        model = genai.GenerativeModel('gemini-pro')
+
+        response = model.generate_content(user_input)
+
+        return response.text.strip()
+
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+
+# Streamlit UI for the chatbot
+def show_chatbot():
+    with st.sidebar.expander("💬 Chat with MatX "):
+        st.title("MatX Chatbot")
+
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
+
+        user_input23 = st.text_input("Ask me anything about algebra or the World:", "")
+        if user_input23:
+            response = get_gemini_response(user_input23)
+
+            st.session_state.chat_history.insert(0, ("MatX", response)) 
+            st.session_state.chat_history.insert(0, ("User", user_input23))  
+        for speaker, message in st.session_state.chat_history:
+            if speaker == "User":
+                st.write(f"**User**: {message}")
+            else:
+                st.write(f"**MatX**: {message}")
+                
+                
 # Main function to render the Streamlit app
 def show_home():
-    st.title("Matrix Operations with File Upload and Manual Input")
+    st.title("Matrix Operations ")   
     st.sidebar.header("Matrix Settings")
     typeOfInput = [matrix_type.value for matrix_type in InputType]
     if "matrix" not in st.session_state:
@@ -117,14 +155,11 @@ def show_home():
         st.session_state.input_type = None
         st.session_state.algorithm = None
         st.session_state.generate_button = False
-        st.experimental_rerun()
+        st.rerun()
 
     # Matrix input type selection
     input_type = st.sidebar.radio("Select Matrix Input Type", typeOfInput)
-    if (
-        st.session_state.input_type == InputType.CSV_UPLOAD.value
-        and input_type != InputType.CSV_UPLOAD.value
-    ):
+    if (st.session_state.input_type == InputType.CSV_UPLOAD.value and input_type != InputType.CSV_UPLOAD.value) or (st.session_state.input_type == InputType.MANUAL_INPUT.value and input_type != InputType.MANUAL_INPUT.value) or (st.session_state.input_type == InputType.RANDOM.value and input_type != InputType.RANDOM.value):
         st.session_state.matrix = None  #
 
     st.session_state.input_type = input_type
@@ -156,33 +191,36 @@ def show_home():
             generate_button = st.sidebar.button("Generate Matrix")
 
         if generate_button:
-            if matrix_type == MatrixType.SQUARE.value:
-                st.session_state.matrix = algorithmes.generate_square_matrix(
-                    rows, element_type, min_val, max_val
-                )
-            elif matrix_type == MatrixType.SYMMETRIC.value and yesorno == "No":
-                st.session_state.matrix = algorithmes.generate_symmetric_matrix(
-                    rows, element_type, min_val, max_val
-                )
-            elif matrix_type == MatrixType.SYMMETRIC.value and yesorno == "Yes":
-                st.session_state.matrix = algorithmes.generate_positive_definite_matrix(
-                    rows, element_type, min_val, max_val
-                )
-            elif matrix_type == MatrixType.DIAGONAL.value:
-                st.session_state.matrix = algorithmes.generate_diagonal_matrix(
-                    rows, element_type, min_val, max_val
-                )
-            elif matrix_type == MatrixType.BAND.value:
-                st.session_state.matrix = algorithmes.generate_band_matrix(
-                    rows,
-                    element_type,
-                    lower_bandwidth,
-                    upper_bandwidth,
-                    min_val,
-                    max_val,
-                )
-            elif matrix_type == MatrixType.IDENTITY.value:
-                st.session_state.matrix = algorithmes.generate_identity_matrix(rows)
+            with st.spinner('Generating random matrix...'):
+        # Simulate a delay for demonstration purposes (optional)
+                time.sleep(1)    
+                if matrix_type == MatrixType.SQUARE.value:
+                    st.session_state.matrix = algorithmes.generate_square_matrix(
+                        rows, element_type, min_val, max_val
+                    )
+                elif matrix_type == MatrixType.SYMMETRIC.value and yesorno == "No":
+                    st.session_state.matrix = algorithmes.generate_symmetric_matrix(
+                        rows, element_type, min_val, max_val
+                    )
+                elif matrix_type == MatrixType.SYMMETRIC.value and yesorno == "Yes":
+                    st.session_state.matrix = algorithmes.generate_positive_definite_matrix(
+                        rows, element_type, min_val, max_val
+                    )
+                elif matrix_type == MatrixType.DIAGONAL.value:
+                    st.session_state.matrix = algorithmes.generate_diagonal_matrix(
+                        rows, element_type, min_val, max_val
+                    )
+                elif matrix_type == MatrixType.BAND.value:
+                    st.session_state.matrix = algorithmes.generate_band_matrix(
+                        rows,
+                        element_type,
+                        lower_bandwidth,
+                        upper_bandwidth,
+                        min_val,
+                        max_val,
+                    )
+                elif matrix_type == MatrixType.IDENTITY.value:
+                    st.session_state.matrix = algorithmes.generate_identity_matrix(rows)
 
     elif input_type == InputType.CSV_UPLOAD.value:
         st.write("### Upload a Matrix File (CSV):")
@@ -260,3 +298,4 @@ def show_home():
                     for step, description in zip(steps, descriptions):
                         st.write(description)
                         st.latex(matrix_to_latex(step))
+    show_chatbot()

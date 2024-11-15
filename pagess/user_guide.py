@@ -2,92 +2,89 @@ import streamlit as st
 
 
 def show_user_guide():
-
-    st.header("User guide")
     st.write(
         """
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ornare, nulla quis 
-        tristique imperdiet, metus sapien ullamcorper magna, nec volutpat quam nulla 
-        egestas neque. Sed cursus nisl ligula, ut ullamcorper quam gravida a. Donec 
-        elementum enim nec nulla vehicula fermentum. Donec semper efficitur purus, ac 
-        tempor quam volutpat eu. Suspendisse potenti. Pellentesque quam erat, feugiat 
-        ac metus ut, commodo suscipit mauris. Duis ut massa maximus, porta tortor at, 
-        hendrerit velit. Integer nec turpis justo. Ut faucibus vel ante sed vulputate. 
-        Sed sed hendrerit nisi. Etiam id odio vel urna egestas pharetra. Pellentesque 
-        tincidunt purus id turpis rutrum accumsan. 
+        # Matrix Manipulator User Guide
 
-        Nulla nisi nisl, egestas vitae sollicitudin sit amet, tincidunt at risus. 
-        Vestibulum ante nisl, scelerisque ut vehicula quis, rutrum vitae ipsum. 
-        Curabitur congue, enim nec laoreet ultricies, ante urna sodales dui, in 
-        ultrices tortor arcu rhoncus diam. Etiam semper mi eget est pharetra, at 
-        lobortis sem ullamcorper. Nam tristique gravida dui, quis iaculis purus 
-        tincidunt quis. Donec turpis sem, ullamcorper quis ex ut, mollis viverra nulla. 
-        Nulla ut arcu ac tellus lobortis tristique quis non orci. Pellentesque blandit, 
-        mi et fringilla aliquet, tortor eros fermentum orci, eget eleifend justo lacus 
-        auctor nulla. Nunc consectetur urna a pulvinar gravida. Phasellus varius, 
-        sapien non ullamcorper varius, ligula odio tempor lorem, nec vulputate nunc 
-        ligula at nibh. Aliquam consectetur ipsum tristique magna tempor, vitae aliquam 
-        erat commodo. Aenean consectetur nisi lectus, sit amet eleifend erat iaculis 
-        eget. Fusce ipsum lectus, pharetra maximus nisl et, fermentum mattis dolor. 
-        Praesent lobortis mauris sed arcu gravida varius. Curabitur leo dolor, laoreet 
-        in mi in, placerat efficitur odio. 
+## **Introduction**
+This application allows users to perform a variety of matrix operations, including generating matrices, applying algorithms, and visualizing the results. Users can interact with the application through a simple web interface built using Streamlit.
 
-        Nullam imperdiet imperdiet vulputate. Sed nec ante risus. Sed et lacus 
-        interdum, commodo nisi et, euismod arcu. Suspendisse sit amet risus sem. Cras 
-        ac magna nec turpis placerat cursus sit amet at erat. Nunc quis velit tellus. 
-        Sed vitae lacus vitae magna malesuada porttitor. Sed rhoncus quis dui sit amet 
-        porta. Sed sollicitudin enim a diam lobortis, eu rutrum magna sodales. Etiam 
-        feugiat ligula ac ipsum condimentum consectetur. Fusce rhoncus nunc et posuere 
-        viverra. Suspendisse at egestas velit. In arcu ligula, sollicitudin sed 
-        ullamcorper et, consectetur et ex. 
+## **Key Features**
+1. **Matrix Input Types**
+    - **Manual Input**: Users can manually input matrix values row by row.
+    - **Random Generation**: Users can generate random matrices based on selected properties.
+    - **CSV Upload**: Users can upload a CSV file containing matrix data.
+    
+2. **Matrix Types**
+    - **Square**: A matrix with an equal number of rows and columns.
+    - **Symmetric**: A matrix that is equal to its transpose.
+    - **Diagonal**: A matrix where non-diagonal elements are zero.
+    - **Band**: A matrix with only a narrow band around the diagonal containing non-zero elements.
+    - **Identity**: A matrix with ones on the diagonal and zeros elsewhere.
 
-        Aliquam est eros, luctus eget massa nec, vestibulum convallis eros. Proin quis 
-        leo metus. Duis sit amet odio in ante consectetur placerat. Fusce quis rutrum 
-        ex. Donec dignissim, orci vitae vulputate facilisis, lacus leo commodo quam, 
-        nec maximus urna libero eget mauris. Cras sit amet neque eget augue malesuada 
-        porttitor. Integer eget lacus non sem hendrerit vulputate at eget ligula. 
-        Curabitur eu dui et leo pulvinar vulputate et sed lorem. Duis scelerisque 
-        turpis ligula, in suscipit lorem auctor id. Duis a odio quis nisl facilisis 
-        porttitor eu ac erat. Quisque eleifend leo vitae libero pulvinar dapibus. 
-        Mauris in eros placerat, consequat dui ac, placerat magna. Morbi eleifend elit 
-        quis erat vehicula placerat. 
+3. **Matrix Operations**
+    - **Transpose**: Flips the matrix along its diagonal.
+    - **Determinant**: Computes the determinant of a square matrix.
+    - **Inverse**: Computes the inverse of a square matrix, if possible.
+    - **Cholesky Decomposition**: Decomposes a positive-definite matrix into a lower triangular matrix.
+    - **Positivity Check**: Checks if the matrix is positive definite.
 
-        Nulla facilisi. Suspendisse ut feugiat lorem. Cras nec luctus elit. Nam id 
-        libero nibh. Integer at rutrum nulla, at elementum neque. Fusce eu lorem urna. 
-        Praesent ornare purus eget dolor fringilla, at luctus sapien venenatis. 
-        Curabitur ut mauris efficitur, fringilla mauris ut, tristique lorem. Aliquam 
-        eget fringilla est. Mauris at tempus dui.
+4. **Matrix Visualization**
+    - **LaTeX Display**: Displays matrices in LaTeX format for better readability.
+    - **CSV Export**: Users can download processed matrices as CSV files.
 
-        Nunc egestas porta odio vel sagittis. Curabitur eget augue vel turpis porttitor 
-        tempus at vitae leo. Mauris iaculis quam non metus luctus, sit amet euismod 
-        metus molestie. Nulla eleifend enim purus, a gravida nisi placerat eget. 
-        Praesent interdum, neque nec sodales tincidunt, enim nisl interdum urna, non 
-        rutrum mauris eros auctor nibh. Donec mauris est, faucibus vitae augue id, 
-        vestibulum gravida felis. Pellentesque habitant morbi tristique senectus et 
-        netus et malesuada fames ac turpis egestas. Suspendisse tristique euismod mi, 
-        sit amet feugiat purus rutrum ut. Nulla vehicula felis nec facilisis accumsan. 
-        Fusce bibendum lobortis magna. Maecenas accumsan laoreet odio, vitae lobortis 
-        metus. Duis in ex tortor. 
+5. **Chatbot Integration**
+    - **MatX Chatbot**: Ask the chatbot about matrices and algebra. It uses the Google Gemini AI model to answer queries.
 
-        Nulla lacus sapien, tristique eu posuere vitae, molestie a erat. In hac 
-        habitasse platea dictumst. Mauris vulputate velit ex, vitae sollicitudin augue 
-        posuere vel. Vestibulum volutpat libero ut velit feugiat posuere. Aliquam non 
-        laoreet quam. Sed scelerisque turpis risus, eu porta justo varius imperdiet. 
-        Donec consequat eros felis, vel tincidunt est placerat nec. 
+---
 
-        Suspendisse maximus libero ac lobortis efficitur. Donec finibus arcu ut tortor 
-        pulvinar, nec tincidunt nulla cursus. Nullam facilisis vulputate lacinia. In a 
-        purus at ex euismod malesuada vitae rutrum neque. Nunc ornare mollis felis, 
-        eget lobortis tellus placerat at. Quisque eget condimentum velit, eget 
-        pellentesque enim. Proin finibus laoreet lacus et sagittis. Phasellus 
-        consectetur lorem ut lacinia tempor. 
+## **How to Use**
 
-        Nam nec mollis sem. Integer sollicitudin nunc et diam rhoncus, eu ultricies 
-        justo vehicula. Cras turpis magna, aliquet eu lectus a, vulputate sagittis 
-        nulla. Cras lectus nulla, volutpat a fermentum nec, hendrerit non turpis. 
-        Mauris sed risus elementum, porta nulla id, consequat lorem. Integer id urna et 
-        mauris rutrum vulputate vitae vitae velit. Duis id interdum ipsum, a feugiat 
-        ante. Nulla condimentum velit est, non facilisis ipsum congue pharetra. Donec 
-        id sapien elementum, porta sem vitae, ifrom pages.community import show_communityuam erat volutpat.
+### 1. **Matrix Input**
+- **Manual Input**: Select "Manual Input" from the sidebar, then specify the number of rows and columns. Enter matrix values in the input fields.
+- **Random Generation**: Select "Random" and choose the matrix type (e.g., Square, Symmetric) and matrix size. You can also specify the range of values for matrix elements.
+- **CSV Upload**: Select "CSV Upload" and upload a CSV file. The matrix will be displayed, and operations can be applied.
+
+### 2. **Matrix Operations**
+- After entering or uploading a matrix, choose an operation from the **Matrix Operations** section in the sidebar:
+    - **Transpose**: Flips the matrix across its diagonal.
+    - **Determinant**: Calculates the determinant for square matrices.
+    - **Inverse**: Computes the inverse of square matrices.
+    - **Cholesky Decomposition**: Decomposes symmetric positive-definite matrices.
+    - **Positivity Check**: Checks if the matrix is positive-definite.
+
+    Results will be displayed in LaTeX format or as a message.
+
+### 3. **Matrix Visualization**
+- The matrix will be displayed in LaTeX format after you input or upload it.
+- After applying an operation, the result will also be displayed in LaTeX format.
+- If a matrix operation generates a new matrix, you can download the result as a CSV file by clicking the **Download Processed Matrix** button.
+
+### 4. **Chatbot**
+- You can ask questions related to matrices and algebra through the chatbot in the sidebar. Simply type a question and receive a response from the MatX chatbot powered by Google Gemini.
+
+---
+
+## **Matrix Types and Operations**
+
+### **Matrix Types**
+- **Square Matrix**: A matrix with the same number of rows and columns.
+- **Symmetric Matrix**: A matrix that is equal to its transpose.
+- **Diagonal Matrix**: A matrix where all non-diagonal elements are zero.
+- **Band Matrix**: A matrix with non-zero elements only in a narrow band around the diagonal.
+- **Identity Matrix**: A square matrix with ones on the diagonal and zeros elsewhere.
+
+### **Operations**
+- **Transpose**: Flips the rows and columns of the matrix.
+- **Determinant**: A scalar value that can be computed only for square matrices. It indicates the matrix's singularity and invertibility.
+- **Inverse**: The inverse matrix, if it exists, is the matrix that, when multiplied by the original matrix, results in the identity matrix.
+- **Cholesky Decomposition**: Decomposes a positive-definite matrix into a lower triangular matrix.
+- **Positivity Check**: Checks if the matrix is positive-definite, which is a requirement for certain decompositions like Cholesky.
+
+---
+
+## **Conclusion**
+This Matrix Manipulator app offers a simple and effective way to handle matrix operations and visualizations. Whether you're working with small matrices or large complex ones, the app provides the tools you need for efficient matrix manipulation.
+
         """
     )

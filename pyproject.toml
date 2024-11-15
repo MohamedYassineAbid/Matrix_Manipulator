@@ -18,6 +18,10 @@ trycourier = "4.4.0"
 altair = "5.4.1"
 argon2-cffi = "21.3.0"
 argon2-cffi-bindings = "21.2.0"
+streamlit-chat = "^0.1.1"
+openai = "^1.54.4"
+requests = "^2.32.3"
+google-generativeai = "^0.8.3"
 
 
 [build-system]
