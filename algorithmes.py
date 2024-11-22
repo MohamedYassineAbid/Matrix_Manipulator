@@ -105,34 +105,44 @@ def generate_band_matrix(
 
 
 # Matrix Minor
-def getMatrixMinor(m, p):
-    if p > 1:
-        return [row[:p] + row[p + 1 :] for row in (m[:p] + m[p + 1 :])]
+def getMatrixMinor(m,i,j):
+    return [row[:j] + row[j+1:] for row in (m[:i]+m[i+1:])]
+
 
 
 # check if defined positive
 def is_positive_definite(matrix):
     return np.all(np.linalg.eigvals(matrix) > 0)
 
+#gauss elinimination  
+def Determinant(a):
+    assert len(a.shape) == 2 
+    assert a.shape[0] == a.shape[1]
+    n = a.shape[0]
+    for k in range(0, n-1):
+       
+        for i in range(k+1, n):
+            if a[i,k] != 0.0:
+                lam = a [i,k]/a[k,k]
+                a[i,k:n] = a[i,k:n] - lam*a[k,k:n]
 
-def Determinant(matrix):
-    return np.round(np.linalg.det(matrix), 2)
+               
+                
+    return np.prod(np.diag(a))
 
 
 def Inverse(matrix):
     return (
-        (np.linalg.inv(matrix))
-        if np.linalg.det(matrix) != 0
-        else ("Matrix is singular!")
+        (np.linalg.inv(matrix)) if Determinant(matrix) != 0 else ("Matrix is singular!")
     )
 
 
 def transposer(matrix):
-    return matrix.T
+    return np.array([[row[i] for row in matrix] for i in range(len(matrix[0]))])
 
 
 def isSymmetric(matrix):
-    return np.all(matrix == matrix.T)
+    return np.all(matrix == transposer(matrix))
 
 
 # check if the matrix is square

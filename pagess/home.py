@@ -42,6 +42,13 @@ def matrix_to_latex(matrix):
 
 # function to save the matrix to a CSV file
 
+def download_csv(csv_file):
+    st.download_button(
+                        label="Download Processed Matrix",
+                        data=csv_file,
+                        file_name="processed_matrix.csv",
+                        mime="text/csv",
+                    )
 
 def save_matrix_to_csv(matrix):
     if isinstance(matrix, np.ndarray) and matrix.ndim == 2:
@@ -96,13 +103,19 @@ def apply_algorithm(matrix, algorithm):
 
 # Clear the matrix from session state
 def clear_matrix():
+    st.session_state.matrix = None
+    st.session_state.input_type = None
+    st.session_state.algorithm = None
+    st.session_state.generate_button = False
     if "matrix" in st.session_state:
         del st.session_state.matrix
+    st.rerun()
 
-my_api_key = "AIzaSyB4Kk2MHNPZlZD4JFiQoPEEICjZ2exNExY"
+my_api_key = creds.api_key2
 
-genai.configure(api_key=my_api_key)
 def get_gemini_response(user_input):
+    my_api_key = creds.api_key2
+    genai.configure(api_key=my_api_key)
     try:
         model = genai.GenerativeModel('gemini-pro')
 
@@ -124,9 +137,8 @@ def show_chatbot():
         user_input23 = st.text_input("Ask me anything about algebra or the World:", "")
         if user_input23:
             response = get_gemini_response(user_input23)
+            st.session_state.chat_history = [("User", user_input23), ("MatX", response)]
 
-            st.session_state.chat_history.insert(0, ("MatX", response)) 
-            st.session_state.chat_history.insert(0, ("User", user_input23))  
         for speaker, message in st.session_state.chat_history:
             if speaker == "User":
                 st.write(f"**User**: {message}")
@@ -138,7 +150,6 @@ def show_chatbot():
 def show_home():
     st.title("Matrix Operations ")   
     st.sidebar.header("Matrix Settings")
-
     typeOfInput = [matrix_type.value for matrix_type in InputType]
     if "matrix" not in st.session_state:
         st.session_state.matrix = None
@@ -165,138 +176,131 @@ def show_home():
     st.session_state.input_type = input_type
     # Matrix type selection and generation if "Random" is selected
     if input_type == InputType.RANDOM.value:
-        typeOfMatrix = [matrix_type.value for matrix_type in MatrixType]
-        element_type = st.sidebar.radio("Select Element Type", ["int", "float"])
-        matrix_type = st.sidebar.selectbox("Select Matrix Type", typeOfMatrix)
-        if matrix_type in typeOfMatrix:
-            rows = cols = st.sidebar.number_input(
-                "Matrix Size (n x n)", min_value=1, max_value=10, value=3
-            )
-            if matrix_type == MatrixType.BAND.value:
-                lower_bandwidth = st.sidebar.number_input(
-                    "Lower Bandwidth", min_value=0, max_value=rows - 1, value=1
-                )
-                upper_bandwidth = st.sidebar.number_input(
-                    "Upper Bandwidth", min_value=0, max_value=rows - 1, value=1
-                )
-            if matrix_type == MatrixType.SYMMETRIC.value:
-                yesorno = st.sidebar.radio(
-                    "Do you want the matrix to be positive definite (No ==> mean random can be positive and it cant be)",
-                    ["Yes", "No"],
-                )
-            col1, col2 = st.sidebar.columns(2)
-            if matrix_type != MatrixType.IDENTITY.value:
-                min_val = col1.number_input("Min Value", value=0)
-                max_val = col2.number_input("Max Value", value=10)
-            generate_button = st.sidebar.button("Generate Matrix")
-
-        if generate_button:
-            with st.spinner('Generating random matrix...'):
-        # Simulate a delay for demonstration purposes (optional)
-                time.sleep(1)    
-                if matrix_type == MatrixType.SQUARE.value:
-                    st.session_state.matrix = algorithmes.generate_square_matrix(
-                        rows, element_type, min_val, max_val
-                    )
-                elif matrix_type == MatrixType.SYMMETRIC.value and yesorno == "No":
-                    st.session_state.matrix = algorithmes.generate_symmetric_matrix(
-                        rows, element_type, min_val, max_val
-                    )
-                elif matrix_type == MatrixType.SYMMETRIC.value and yesorno == "Yes":
-                    st.session_state.matrix = algorithmes.generate_positive_definite_matrix(
-                        rows, element_type, min_val, max_val
-                    )
-                elif matrix_type == MatrixType.DIAGONAL.value:
-                    st.session_state.matrix = algorithmes.generate_diagonal_matrix(
-                        rows, element_type, min_val, max_val
-                    )
-                elif matrix_type == MatrixType.BAND.value:
-                    st.session_state.matrix = algorithmes.generate_band_matrix(
-                        rows,
-                        element_type,
-                        lower_bandwidth,
-                        upper_bandwidth,
-                        min_val,
-                        max_val,
-                    )
-                elif matrix_type == MatrixType.IDENTITY.value:
-                    st.session_state.matrix = algorithmes.generate_identity_matrix(rows)
-
+        return handle_random_matrix_input()
     elif input_type == InputType.CSV_UPLOAD.value:
-        st.write("### Upload a Matrix File (CSV):")
-        uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
-        if uploaded_file is not None:
-            try:
-                df = pd.read_csv(uploaded_file, header=None)
-                st.session_state.matrix = df.to_numpy()
-                st.write("### Matrix from CSV File:")
-                st.dataframe(df)
-            except Exception as e:
-                st.error(f"Error reading file: {e}")
-
+        return handle_csv_upload()
     elif input_type == InputType.MANUAL_INPUT.value:
-        rows = st.sidebar.number_input(
-            "Number of Rows", min_value=1, max_value=10, value=3
+        return handle_manual_input()
+    
+def handle_random_matrix_input():
+    typeOfMatrix = [matrix_type.value for matrix_type in MatrixType]
+    element_type = st.sidebar.radio("Select Element Type", ["int", "float"])
+    matrix_type = st.sidebar.selectbox("Select Matrix Type", typeOfMatrix)
+    rows = cols = st.sidebar.number_input("Matrix Size (n x n)", min_value=1, max_value=10, value=3)
+
+    lower_bandwidth, upper_bandwidth = None, None
+    yesorno = None
+
+    if matrix_type == MatrixType.BAND.value:
+        lower_bandwidth = st.sidebar.number_input("Lower Bandwidth", min_value=0, max_value=rows - 1, value=1)
+        upper_bandwidth = st.sidebar.number_input("Upper Bandwidth", min_value=0, max_value=rows - 1, value=1)
+
+    if matrix_type == MatrixType.SYMMETRIC.value:
+        yesorno = st.sidebar.radio(
+            "Do you want the matrix to be positive definite?", ["Yes", "No"]
         )
-        cols = st.sidebar.number_input(
-            "Number of Columns", min_value=1, max_value=10, value=3
-        )
-        st.write("### Enter Matrix Values Manually")
-        st.session_state.matrix = np.zeros((rows, cols))
-        for i in range(rows):
-            cols_input = st.columns(cols)
-            for j in range(cols):
-                st.session_state.matrix[i][j] = float(
-                    cols_input[j].text_input(f"Row {i + 1}, Col {j + 1}", value="0")
-                )
+
+    min_val = st.sidebar.number_input("Min Value", value=0)
+    max_val = st.sidebar.number_input("Max Value", value=10)
+    generate_button = st.sidebar.button("Generate Matrix")
+
+    if generate_button:
+        with st.spinner('Generating random matrix...'):
+            time.sleep(0.5)  
+            matrix = generate_random_matrix(matrix_type, rows, element_type, min_val, max_val, lower_bandwidth, upper_bandwidth, yesorno)
+            st.session_state.matrix = matrix
+            st.latex(matrix_to_latex(matrix))
 
 
-    # Matrix operation selection, always visible
-    st.sidebar.header("Matrix Operations")
-    algorithm_type = [algorithm.value for algorithm in AlgorithmType]
-    algorithm = st.sidebar.selectbox("Choose an Algorithm", algorithm_type)
+def handle_csv_upload():
+    st.write("### Upload a Matrix File (CSV):")
+    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+    if uploaded_file is not None:
+        try:
+            df = pd.read_csv(uploaded_file, header=None)
+            st.session_state.matrix = df.to_numpy()
+            st.write("### Matrix from CSV File:")
+            st.dataframe(df)
+        except Exception as e:
+            st.error(f"Error reading file: {e}")
 
-    # Apply selected algorithm and display results for csv
-    if st.session_state.matrix is not None and input_type == InputType.CSV_UPLOAD.value:
-        if algorithm != AlgorithmType.NONE.value:
-            result, _, _ = apply_algorithm(st.session_state.matrix, algorithm)
+def handle_manual_input():
+    rows = st.sidebar.number_input("Number of Rows", min_value=1, max_value=5, value=3)
+    cols = st.sidebar.number_input("Number of Columns", min_value=1, max_value=5, value=3)
+    st.write("### Enter Matrix Values Manually")
+    matrix = np.zeros((rows, cols))
+    for i in range(rows):
+        cols_input = st.columns(cols)
+        for j in range(cols):
+            matrix[i][j] = float(cols_input[j].number_input(f"Row {i + 1}, Col {j + 1}", value=0.0))
+            
+    st.session_state.matrix = matrix
+    st.latex(matrix_to_latex(matrix))
 
-            if isinstance(result, np.ndarray):
-                csv_file = save_matrix_to_csv(result)
-                if csv_file:
-                    st.download_button(
-                        label="Download Processed Matrix",
-                        data=csv_file,
-                        file_name="processed_matrix.csv",
-                        mime="text/csv",
-                    )
-            else:
-                st.write(f"#### {result}")
 
-    # Display matrix in LaTeX format if available for non csv
 
-    if st.session_state.matrix is not None and input_type != InputType.CSV_UPLOAD.value:
-        st.write("### Matrix in LaTeX Format:")
-        st.latex(matrix_to_latex(st.session_state.matrix))
-
-        # Apply selected algorithm and display results
-        if algorithm != AlgorithmType.NONE.value:
-            st.write(f"### Result of {algorithm}:")
-            result, steps, descriptions = apply_algorithm(
-                st.session_state.matrix, algorithm
-            )
+def apply_and_display_algorithm(matrix, algorithm):
+    if algorithm != AlgorithmType.NONE.value :
+        st.write(f"### Result of {algorithm}:")
+        result, steps, descriptions = apply_algorithm(matrix, algorithm)
+        if (st.session_state.input_type != InputType.CSV_UPLOAD.value):
             if result is not None:
                 if isinstance(result, np.ndarray):
                     st.latex(matrix_to_latex(result))
+                    download_csv(save_matrix_to_csv(result))
                 else:
                     st.write(f"#### {result}")
 
-                # Display additional information for Cholesky
-                if algorithm == AlgorithmType.CHOLESKY.value and isinstance(
-                    result, np.ndarray
-                ):
+                if algorithm == AlgorithmType.CHOLESKY.value and isinstance(result, np.ndarray):
                     st.write("### Steps of Cholesky Decomposition:")
                     for step, description in zip(steps, descriptions):
                         st.write(description)
                         st.latex(matrix_to_latex(step))
+                        download_csv(save_matrix_to_csv(result))
+        elif (st.session_state.input_type == InputType.CSV_UPLOAD.value):
+            if result is not None:
+                if isinstance(result, np.ndarray):
+                    download_csv(save_matrix_to_csv(result))
+
+                else:
+                    st.write(f"#### {result}")
+
+                    
+def show_home():
+    st.title("Matrix Operations")
+    st.sidebar.header("Matrix Settings")
+
+    # Session state initialization
+    if "matrix" not in st.session_state:
+        st.session_state.matrix = None
+    if "input_type" not in st.session_state:
+        st.session_state.input_type = None
+    if "algorithm" not in st.session_state:
+        st.session_state.algorithm = None
+
+    # Clear matrix button
+    if st.sidebar.button("Clear Matrix"):
+        clear_matrix()
+
+    # Matrix input type selection
+    type_of_input = [matrix_type.value for matrix_type in InputType]
+    input_type = st.sidebar.radio("Select Matrix Input Type", type_of_input)
+
+    if st.session_state.input_type != input_type:
+        st.session_state.matrix = None
+    st.session_state.input_type = input_type
+
+    # Handle matrix input based on type
+    handle_matrix_input(input_type)
+
+    # Matrix operation selection
+    st.sidebar.header("Matrix Operations")
+    algorithm_type = [algorithm.value for algorithm in AlgorithmType]
+    algorithm = st.sidebar.selectbox("Choose an Algorithm", algorithm_type)
+
+    # Apply and display the selected algorithm result
+    if st.session_state.matrix is not None:
+        apply_and_display_algorithm(st.session_state.matrix, algorithm)
+        
+
     show_chatbot()

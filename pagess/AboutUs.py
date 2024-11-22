@@ -50,7 +50,7 @@ This project was supervised by:
 
 We welcome your feedback and suggestions! If you have any questions, would like to report an issue, or want to learn more about the project, please reach out to us:
 
-- **Email**: support@matrixmanipulator.com  
-- **Website**: www.matrixmanipulator.com
+- **Email**: manipulatormatrix@gmail.com 
+- **GitHub**: [Matrix Manipulator](https://github.com/MohamedAliJmal/Matrix_Manipulator)
 """)
     

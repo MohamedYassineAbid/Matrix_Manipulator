@@ -3,7 +3,7 @@ import streamlit as st
 from streamlit_navigation_bar import st_navbar
 import os
 
-st.set_page_config(page_title="MatManipulator", page_icon="logo.svg", layout="wide")
+st.set_page_config(page_title="MatX Manipulator", page_icon="💻", layout="wide")
 def navbar():
 
     pages = ["Home", "User Guide",  "About Us", "GitHub", "Account"]
