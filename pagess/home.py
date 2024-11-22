@@ -6,7 +6,6 @@ import algorithmes
 import pandas as pd
 import numpy as np
 from streamlit_chat import message
-import creds
 import google.generativeai as genai
 
 class MatrixType(Enum):
@@ -100,7 +99,7 @@ def clear_matrix():
     if "matrix" in st.session_state:
         del st.session_state.matrix
 
-my_api_key = creds.api_key2
+my_api_key = "AIzaSyB4Kk2MHNPZlZD4JFiQoPEEICjZ2exNExY"
 
 genai.configure(api_key=my_api_key)
 def get_gemini_response(user_input):
@@ -139,6 +138,7 @@ def show_chatbot():
 def show_home():
     st.title("Matrix Operations ")   
     st.sidebar.header("Matrix Settings")
+
     typeOfInput = [matrix_type.value for matrix_type in InputType]
     if "matrix" not in st.session_state:
         st.session_state.matrix = None

@@ -6,7 +6,7 @@ import os
 st.set_page_config(page_title="MatManipulator", page_icon="logo.svg", layout="wide")
 def navbar():
 
-    pages = ["Home", "User Guide", "API", "About Us", "GitHub", "Account"]
+    pages = ["Home", "User Guide",  "About Us", "GitHub", "Account"]
     parent_dir = os.path.dirname(os.path.abspath(__file__))
     logo_path = os.path.join(parent_dir, "assets/logo/logo.svg")
     urls = {"GitHub": "https://github.com/MohamedAliJmal/Matrix_Manipulator"}
@@ -41,7 +41,6 @@ page = navbar()
 functions = {
     "Home": pagess.show_home,
     "User Guide": pagess.show_user_guide,
-    "API": pagess.show_api,
     "About Us": pagess.show_examples,
     "Account": pagess.show_account,
 }

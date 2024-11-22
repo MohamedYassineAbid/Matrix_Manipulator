@@ -248,6 +248,61 @@ class __login__:
                         change_passwd(email_reset_passwd, new_passwd)
                         st.success("Password Reset Successfully!")
 
+
+    def reset_password_from_settings(self) -> None:
+        """
+        Creates the reset password widget and after user authentication (email and the password shared over that email),
+        resets the password and updates the same in the _secret_auth_.json file.
+        """
+        email=str()
+        with open("assets/token/_secret_auth_.json", "r") as auth_json:
+            authorized_users_data = json.load(auth_json)
+
+            for user in authorized_users_data:
+                if user["username"] == self.get_username():
+                  email=user["email"]
+                  break
+
+        with st.form("Reset Password Form"):
+            
+           
+
+            current_passwd = st.text_input(
+                "Current Password",
+                placeholder="Please enter the password you received in the email",
+            )
+            current_passwd_check = check_current_passwd(
+                email, current_passwd
+            )
+
+            new_passwd = st.text_input(
+                "New Password",
+                placeholder="Please enter a new, strong password",
+                type="password",
+            )
+
+            new_passwd_1 = st.text_input(
+                "Re - Enter New Password",
+                placeholder="Please re- enter the new password",
+                type="password",
+            )
+
+            reset_passwd_submit_button = st.form_submit_button(label="Reset Password")
+
+            if reset_passwd_submit_button:
+               
+                if current_passwd_check == False:
+                    st.error("Incorrect password!")
+
+                elif new_passwd != new_passwd_1:
+                    st.error("Passwords don't match!")
+
+                
+                elif current_passwd_check == True:
+                        change_passwd(email, new_passwd)
+                        st.success("Password Reset Successfully!")
+
+
     def logout_widget(self) -> None:
         """
         Creates the logout widget in the sidebar only if the user is logged in.
@@ -310,7 +365,9 @@ class __login__:
                     },
                 },
             )
-            return main_page_sidebar, selected_option
+            return main_page_sidebar, selected_option,self.get_username().capitalize()
+        
+    
 
     def build_login_ui(self):
         """
