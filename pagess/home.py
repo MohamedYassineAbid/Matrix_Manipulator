@@ -6,6 +6,7 @@ import algorithmes
 import pandas as pd
 import numpy as np
 from streamlit_chat import message
+import creds
 import google.generativeai as genai
 
 class MatrixType(Enum):
@@ -111,7 +112,6 @@ def clear_matrix():
         del st.session_state.matrix
     st.rerun()
 
-my_api_key = creds.api_key2
 
 def get_gemini_response(user_input):
     my_api_key = creds.api_key2
@@ -147,34 +147,24 @@ def show_chatbot():
                 
                 
 # Main function to render the Streamlit app
-def show_home():
-    st.title("Matrix Operations ")   
-    st.sidebar.header("Matrix Settings")
-    typeOfInput = [matrix_type.value for matrix_type in InputType]
-    if "matrix" not in st.session_state:
-        st.session_state.matrix = None
-    if "input_type" not in st.session_state:
-        st.session_state.input_type = None
-    if "algorithm" not in st.session_state:
-        st.session_state.algorithm = None
-    if "generate_button" not in st.session_state:
-        st.session_state.generate_button = False
+def generate_random_matrix(matrix_type, rows, element_type, min_val, max_val, lower_bandwidth=None, upper_bandwidth=None, yesorno=None):
+    if matrix_type == MatrixType.SQUARE.value:
+        return algorithmes.generate_square_matrix(rows, element_type, min_val, max_val)
+    elif matrix_type == MatrixType.SYMMETRIC.value:
+        if yesorno == "No":
+            return algorithmes.generate_symmetric_matrix(rows, element_type, min_val, max_val)
+        else:
+            return algorithmes.generate_positive_definite_matrix(rows, element_type, min_val, max_val)
+    elif matrix_type == MatrixType.DIAGONAL.value:
+        return algorithmes.generate_diagonal_matrix(rows, element_type, min_val, max_val)
+    elif matrix_type == MatrixType.BAND.value:
+        return algorithmes.generate_band_matrix(rows, element_type, lower_bandwidth, upper_bandwidth, min_val, max_val)
+    elif matrix_type == MatrixType.IDENTITY.value:
+        return algorithmes.generate_identity_matrix(rows)
+    return None
 
-    if st.sidebar.button("Clear Matrix"):
-        clear_matrix()
-        st.session_state.matrix = None
-        st.session_state.input_type = None
-        st.session_state.algorithm = None
-        st.session_state.generate_button = False
-        st.rerun()
 
-    # Matrix input type selection
-    input_type = st.sidebar.radio("Select Matrix Input Type", typeOfInput)
-    if (st.session_state.input_type == InputType.CSV_UPLOAD.value and input_type != InputType.CSV_UPLOAD.value) or (st.session_state.input_type == InputType.MANUAL_INPUT.value and input_type != InputType.MANUAL_INPUT.value) or (st.session_state.input_type == InputType.RANDOM.value and input_type != InputType.RANDOM.value):
-        st.session_state.matrix = None  #
-
-    st.session_state.input_type = input_type
-    # Matrix type selection and generation if "Random" is selected
+def handle_matrix_input(input_type):
     if input_type == InputType.RANDOM.value:
         return handle_random_matrix_input()
     elif input_type == InputType.CSV_UPLOAD.value:
