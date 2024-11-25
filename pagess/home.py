@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from streamlit_chat import message
 import creds
+import io
 import google.generativeai as genai
 
 class MatrixType(Enum):
@@ -24,6 +25,7 @@ class AlgorithmType(Enum):
     INVERSE = "Inverse"
     CHOLESKY = "Cholesky"
     POSITIVITY = "Positivity"
+    SOLVE_AXB = "Solve AX = B" 
 
 
 class InputType(Enum):
@@ -34,36 +36,58 @@ class InputType(Enum):
 
 # Convert a matrix to LaTeX format
 def matrix_to_latex(matrix):
-    latex_str = "\\begin{bmatrix}"
+    latex_str = "\\begin{bmatrix}\n"
+    
     for row in matrix:
-        latex_str += " & ".join(map(str, row)) + " \\\\ "
+        row = row if isinstance(row, (list, np.ndarray)) else [row]
+        
+        latex_str += " & ".join(map(str, row)) + " \\\\ \n"
+    
     latex_str += "\\end{bmatrix}"
     return latex_str
 
 
-# function to save the matrix to a CSV file
-
-def download_csv(csv_file):
-    st.download_button(
-                        label="Download Processed Matrix",
-                        data=csv_file,
-                        file_name="processed_matrix.csv",
-                        mime="text/csv",
-                    )
-
 def save_matrix_to_csv(matrix):
-    if isinstance(matrix, np.ndarray) and matrix.ndim == 2:
-        df = pd.DataFrame(matrix)
-        csv_data = df.to_csv(index=False, header=False)
-        return csv_data
-    else:
-        st.error("Matrix is not in a valid 2D format.")
-        return None
+    df = pd.DataFrame(matrix)
+    
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False)
+    buffer.seek(0) 
+    return buffer.getvalue() 
 
+# Function to display the download button
+def download_csv(csv_content):
+    csv_bytes = csv_content.encode() 
+    
+    st.download_button(
+        label="Download CSV",
+        data=csv_bytes,
+        file_name="matrix.csv",
+        mime="text/csv",
+    )
+
+def handle_resolution(matrix):
+    st.write("### Provide Matrix B for AX = B:")
+    rows, cols = matrix.shape
+    b_matrix = np.zeros((rows, 1))
+    b_cols_input = st.columns(1)
+    for i in range(rows):
+        b_matrix[i][0] = b_cols_input[0].number_input(f"B[{i + 1}]", value=0.0,step=1.0)
+    return b_matrix
 
 # Apply the chosen algorithm on the matrix
 def apply_algorithm(matrix, algorithm):
-    if algorithm == AlgorithmType.TRANSPOSE.value:
+    if algorithm == AlgorithmType.SOLVE_AXB.value:
+        b_matrix = handle_resolution(matrix)
+        try:
+            if algorithmes.isSquare(matrix):
+                solution = algorithmes.resolution(matrix, b_matrix)
+                return solution, [], []
+            else:
+                return "Matrix A must be square to solve AX = B!", [], []
+        except np.linalg.LinAlgError as e:
+            return f"Error in solving AX = B: {e}", [], []
+    elif algorithm == AlgorithmType.TRANSPOSE.value:
         return algorithmes.transposer(matrix), [], []
     elif algorithm == AlgorithmType.DETERMINANT.value:
         if algorithmes.isSquare(matrix):
@@ -180,18 +204,17 @@ def handle_random_matrix_input():
 
     lower_bandwidth, upper_bandwidth = None, None
     yesorno = None
-
+    col1, col2 = st.sidebar.columns(2)
     if matrix_type == MatrixType.BAND.value:
-        lower_bandwidth = st.sidebar.number_input("Lower Bandwidth", min_value=0, max_value=rows - 1, value=1)
-        upper_bandwidth = st.sidebar.number_input("Upper Bandwidth", min_value=0, max_value=rows - 1, value=1)
+        lower_bandwidth = col1.number_input("Lower Bandwidth", min_value=0, max_value=rows - 1, value=1)
+        upper_bandwidth = col2.number_input("Upper Bandwidth", min_value=0, max_value=rows - 1, value=1)
 
     if matrix_type == MatrixType.SYMMETRIC.value:
         yesorno = st.sidebar.radio(
             "Do you want the matrix to be positive definite?", ["Yes", "No"]
         )
-
-    min_val = st.sidebar.number_input("Min Value", value=0)
-    max_val = st.sidebar.number_input("Max Value", value=10)
+    min_val = col1.number_input("Min Value", value=0)
+    max_val = col2.number_input("Max Value", value=10)
     generate_button = st.sidebar.button("Generate Matrix")
 
     if generate_button:
@@ -214,22 +237,78 @@ def handle_csv_upload():
         except Exception as e:
             st.error(f"Error reading file: {e}")
 
+import streamlit as st
+import numpy as np
+
+def matrix_to_latex(matrix):
+    """Converts a NumPy matrix to a LaTeX bmatrix string for display in Streamlit."""
+    latex_str = "\\begin{bmatrix}\n"
+    latex_str += "\\\\\n".join([" & ".join(map(str, row)) for row in matrix])
+    latex_str += "\n\\end{bmatrix}"
+    return latex_str
+
 def handle_manual_input():
+    # Select matrix type
+    matrix_type = st.sidebar.selectbox(
+        "Select Matrix Type",
+        ["Custom", "Symmetric", "Diagonal", "Identity"]
+    )
+
+    # Set matrix dimensions
     rows = st.sidebar.number_input("Number of Rows", min_value=1, max_value=5, value=3)
     cols = st.sidebar.number_input("Number of Columns", min_value=1, max_value=5, value=3)
-    st.write("### Enter Matrix Values Manually")
+    
+    # Ensure square matrix for symmetric/diagonal/identity types
+    if matrix_type in ["Symmetric", "Diagonal", "Identity"]:
+        cols = rows  # Force square matrix
+        st.sidebar.info("Matrix forced to square for selected type.")
+
+    st.write("### Enter Matrix Values")
+
+    # Initialize matrix
     matrix = np.zeros((rows, cols))
-    for i in range(rows):
-        cols_input = st.columns(cols)
-        for j in range(cols):
-            matrix[i][j] = float(cols_input[j].number_input(f"Row {i + 1}, Col {j + 1}", value=0.0))
-            
+
+    if matrix_type == "Custom":
+        # Full matrix input for custom type
+        for i in range(rows):
+            cols_input = st.columns(cols)
+            for j in range(cols):
+                matrix[i][j] = cols_input[j].number_input(
+                    f"Row {i + 1}, Col {j + 1}", value=0.0, step=1.0, key=f"custom_{i}_{j}"
+                )
+
+    elif matrix_type == "Symmetric":
+        # Input for upper triangle; lower triangle auto-filled
+        for i in range(rows):
+            cols_input = st.columns(cols)
+            for j in range(i, cols):  # Upper triangle only
+                matrix[i][j] = cols_input[j].number_input(
+                    f"Row {i + 1}, Col {j + 1}", value=0.0, step=1.0, key=f"sym_{i}_{j}"
+                )
+                matrix[j][i] = matrix[i][j]  # Symmetric fill
+
+    elif matrix_type == "Diagonal":
+        # Input for diagonal elements only
+        for i in range(rows):
+            cols_input = st.columns(1)  # Single column for diagonal
+            matrix[i][i] = cols_input[0].number_input(
+                f"Diagonal Element {i + 1}", value=0.0, step=1.0, key=f"diag_{i}"
+            )
+
+    elif matrix_type == "Identity":
+        # Auto-fill identity matrix
+        matrix = np.eye(rows)
+        st.info("Identity Matrix auto-filled!")
+
+    # Store and display matrix
     st.session_state.matrix = matrix
     st.latex(matrix_to_latex(matrix))
 
 
 
+
 def apply_and_display_algorithm(matrix, algorithm):
+    
     if algorithm != AlgorithmType.NONE.value :
         st.write(f"### Result of {algorithm}:")
         result, steps, descriptions = apply_algorithm(matrix, algorithm)
@@ -246,7 +325,6 @@ def apply_and_display_algorithm(matrix, algorithm):
                     for step, description in zip(steps, descriptions):
                         st.write(description)
                         st.latex(matrix_to_latex(step))
-                        download_csv(save_matrix_to_csv(result))
         elif (st.session_state.input_type == InputType.CSV_UPLOAD.value):
             if result is not None:
                 if isinstance(result, np.ndarray):
@@ -279,6 +357,7 @@ def show_home():
     if st.session_state.input_type != input_type:
         st.session_state.matrix = None
     st.session_state.input_type = input_type
+    # Create zero matrix for L
 
     # Handle matrix input based on type
     handle_matrix_input(input_type)

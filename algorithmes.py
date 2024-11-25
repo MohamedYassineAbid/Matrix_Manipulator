@@ -11,34 +11,62 @@ def cholesky(A):
     returns the lower triangular matrix, L, along with the
     steps and descriptions of the calculations."""
     n = len(A)
-
-    # Create zero matrix for L
     L = np.zeros((n, n))
-
-    steps = []  # To hold intermediate matrices
-    descriptions = []  # To hold descriptions of each step
+    steps = []  
+    descriptions = []  
 
     # Perform the Cholesky decomposition
-    for i in range(n):
-        for k in range(i + 1):
-            tmp_sum = sum(L[i][j] * L[k][j] for j in range(k))
-
-            if i == k:  # Diagonal elements
-                L[i][k] = sqrt(A[i][i] - tmp_sum)
-                # Add the current state of L and the description
-                steps.append(L.copy())
-                descriptions.append(
-                    f"##### Calculated L[{i},{k}] = √(A[{i},{i}] - Σ(L[{i},j]²) for j=0 to {k-1}."
-                )
-            else:
-                L[i][k] = (1.0 / L[k][k]) * (A[i][k] - tmp_sum)
-                # Add the current state of L and the description
-                steps.append(L.copy())
-                descriptions.append(
-                    f" ##### Calculated L[{i},{k}] = (A[{i},{k}] - Σ(L[{i},j] * L[{k},j]) for j=0 to {k-1}) / L[{k},{k}]."
-                )
+    for j in range(n):
+        L[j][j] = A[j][j]
+        
+        for k in range(j):
+            L[j][j] -= L[j][k] ** 2
+        
+        L[j][j] = sqrt(L[j][j])
+        for i in range(j + 1, n):
+            L[i][j] = A[i][j]
+            for k in range(j):
+                L[i][j] -= L[i][k] * L[j][k]
+            L[i][j] /= L[j][j]
+        steps.append(np.round(L, 2))
+        descriptions.append(
+            f"Step {j+1}: L_{j+1}{j+1} = {L[j][j]}\n"
+            + "".join(
+                [
+                    f"L_{i+1}{j+1} = {L[i][j]}\n"
+                    for i in range(j + 1, n)
+                ]
+            )
+        )
+        
+            
 
     return np.round(L, 2), np.round(steps, 2), descriptions
+# Resolution method for solving system of equations with message output instead of errors
+def resolution(A, b):
+    A = np.array(A, dtype=float)
+    b = np.array(b, dtype=float)
+    n = A.shape[0]
+    
+    # Step 1: Apply Gaussian elimination
+    U, error_msg = gauss_elimination(A)
+    if error_msg:
+        return error_msg  # Return the error message if singular matrix detected
+    
+    # Step 2: Back-substitution to solve for x
+    x = np.zeros(n)
+    for i in range(n-1, -1, -1):
+        if U[i, i] == 0:
+            return "Matrix is singular or nearly singular."
+        
+        x[i] = b[i]
+        for j in range(i+1, n):
+            x[i] -= U[i, j] * x[j]
+        x[i] /= U[i, i]
+    
+    return x
+
+        
 
 
 type_mapping = {"int": int, "float": float}
@@ -113,21 +141,46 @@ def getMatrixMinor(m,i,j):
 # check if defined positive
 def is_positive_definite(matrix):
     return np.all(np.linalg.eigvals(matrix) > 0)
+import numpy as np
 
-#gauss elinimination  
-def Determinant(a):
-    assert len(a.shape) == 2 
-    assert a.shape[0] == a.shape[1]
-    n = a.shape[0]
-    for k in range(0, n-1):
-       
+# Gaussian elimination method with error message instead of raising errors
+def gauss_elimination(A):
+    A = A.copy()
+    n = A.shape[0]
+    for k in range(n-1):
+        max_row = k
+        max_value = abs(A[k, k])
         for i in range(k+1, n):
-            if a[i,k] != 0.0:
-                lam = a [i,k]/a[k,k]
-                a[i,k:n] = a[i,k:n] - lam*a[k,k:n]
+            if abs(A[i, k]) > max_value:
+                max_value = abs(A[i, k])
+                max_row = i
+        
+        # If pivot element is zero, matrix is singular, return message
+        if max_value == 0:
+            return A, "Matrix is singular or nearly singular."
+        
+        if max_row != k:
+            A[[k, max_row]] = A[[max_row, k]]
+        
+        for i in range(k+1, n):
+            if A[i, k] != 0.0:
+                factor = A[i, k] / A[k, k]
+                A[i, k:] -= factor * A[k, k:]
+    
+    return A, None  # Return None if no error
 
-               
-                
+
+
+
+
+
+
+#determinant
+
+def Determinant(a):
+    a,b=gauss_elimination(a) 
+    if b :
+        return b           
     return np.prod(np.diag(a))
 
 
