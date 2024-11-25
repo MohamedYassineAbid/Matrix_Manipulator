@@ -247,13 +247,16 @@ def handle_manual_input():
     )
 
     # Set matrix dimensions
-    rows = st.sidebar.number_input("Number of Rows", min_value=1, max_value=5, value=3)
-    cols = st.sidebar.number_input("Number of Columns", min_value=1, max_value=5, value=3)
+    
     
     # Ensure square matrix for symmetric/diagonal/identity types
     if matrix_type in ["Symmetric", "Diagonal", "Identity"]:
-        cols = rows  
+        rows = st.sidebar.number_input("Number of Rows", min_value=1, max_value=5, value=3)
+        cols = rows
         st.sidebar.info("Matrix forced to square for selected type.")
+    else :
+        rows = st.sidebar.number_input("Number of Rows", min_value=1, max_value=5, value=3)
+        cols = st.sidebar.number_input("Number of Columns", min_value=1, max_value=5, value=3)
 
     st.write("### Enter Matrix Values")
 
