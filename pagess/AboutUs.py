@@ -41,7 +41,7 @@ def show_examples():
         
     
     with col2:
-        st.markdown("#### Mohamed Yassine Abid")
+        st.markdown("#### [Mohamed Yassine Abid](https://github.com/MohamedYassineAbid)")
         st.write("Data Engineering Student")
         st.write("Faculty of Sciences of Sfax")
     
@@ -50,7 +50,7 @@ def show_examples():
     with col1:
         st.image("images/jmal.jpeg", width=100)
     with col2:
-        st.markdown("#### Mohamed Ali Djmal")
+        st.markdown("#### [Mohamed Ali Djmal](https://github.com/chameauu)")
         st.write("Data Engineering Student")
         st.write("Faculty of Sciences of Sfax")
     
@@ -58,7 +58,7 @@ def show_examples():
     with col1:
         st.image("images/chakster.png", width=100)
     with col2:
-        st.markdown("#### Ahmad Chakcha")
+        st.markdown("#### [Ahmad Chakcha](https://github.com/AhmadChakcha)")
         st.write("Data Engineering Student")
         st.write("Faculty of Sciences of Sfax")
         

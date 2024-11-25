@@ -34,7 +34,6 @@ class InputType(Enum):
     CSV_UPLOAD = "CSV Upload"
     
 
-# Convert a matrix to LaTeX format
 def matrix_to_latex(matrix):
     latex_str = "\\begin{bmatrix}\n"
     
@@ -237,15 +236,8 @@ def handle_csv_upload():
         except Exception as e:
             st.error(f"Error reading file: {e}")
 
-import streamlit as st
-import numpy as np
 
-def matrix_to_latex(matrix):
-    """Converts a NumPy matrix to a LaTeX bmatrix string for display in Streamlit."""
-    latex_str = "\\begin{bmatrix}\n"
-    latex_str += "\\\\\n".join([" & ".join(map(str, row)) for row in matrix])
-    latex_str += "\n\\end{bmatrix}"
-    return latex_str
+
 
 def handle_manual_input():
     # Select matrix type
@@ -260,7 +252,7 @@ def handle_manual_input():
     
     # Ensure square matrix for symmetric/diagonal/identity types
     if matrix_type in ["Symmetric", "Diagonal", "Identity"]:
-        cols = rows  # Force square matrix
+        cols = rows  
         st.sidebar.info("Matrix forced to square for selected type.")
 
     st.write("### Enter Matrix Values")
@@ -269,7 +261,6 @@ def handle_manual_input():
     matrix = np.zeros((rows, cols))
 
     if matrix_type == "Custom":
-        # Full matrix input for custom type
         for i in range(rows):
             cols_input = st.columns(cols)
             for j in range(cols):
@@ -278,19 +269,18 @@ def handle_manual_input():
                 )
 
     elif matrix_type == "Symmetric":
-        # Input for upper triangle; lower triangle auto-filled
         for i in range(rows):
             cols_input = st.columns(cols)
-            for j in range(i, cols):  # Upper triangle only
+            for j in range(i, cols):  
                 matrix[i][j] = cols_input[j].number_input(
                     f"Row {i + 1}, Col {j + 1}", value=0.0, step=1.0, key=f"sym_{i}_{j}"
                 )
-                matrix[j][i] = matrix[i][j]  # Symmetric fill
+                matrix[j][i] = matrix[i][j]  
 
     elif matrix_type == "Diagonal":
         # Input for diagonal elements only
         for i in range(rows):
-            cols_input = st.columns(1)  # Single column for diagonal
+            cols_input = st.columns(1)  
             matrix[i][i] = cols_input[0].number_input(
                 f"Diagonal Element {i + 1}", value=0.0, step=1.0, key=f"diag_{i}"
             )
