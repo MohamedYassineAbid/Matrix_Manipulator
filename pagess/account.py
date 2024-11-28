@@ -1,26 +1,16 @@
-import streamlit as st
 from widgets.widgets import __login__
-import pandas as pd
-import json
-import io
+import creds
 
 
 
 
-def retrieve_data(File:str)->bytes:
-    with open(f"assets/token/matrices/{File}",'r') as file:
-        res=pd.read_csv(file)
-        buffer = io.StringIO()
-        res.to_csv(buffer, index=False)
-        buffer.seek(0) 
-    return buffer.getvalue().encode()
-        
+
 
 
 
 def show_account()->None:
 
-    __login__obj = __login__(auth_token="your_token")
+    __login__obj = __login__(auth_token=creds.api_key1)
 
     LOGGED_IN = __login__obj.build_login_ui()
 

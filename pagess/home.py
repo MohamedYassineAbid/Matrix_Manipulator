@@ -5,7 +5,7 @@ import algorithmes
 import pandas as pd
 import numpy as np
 from streamlit_chat import message
-import creds
+import creds as creds
 import io
 import google.generativeai as genai
 from datetime import datetime
