@@ -5,7 +5,7 @@ import algorithmes
 import pandas as pd
 import numpy as np
 from streamlit_chat import message
-#import creds
+import creds
 import io
 import google.generativeai as genai
 from datetime import datetime
@@ -145,7 +145,7 @@ def clear_matrix():
 
 
 def get_gemini_response(user_input):
-    my_api_key = "AIzaSyB4Kk2MHNPZlZD4JFiQoPEEICjZ2exNExY"
+    my_api_key = creds.api_key2
     genai.configure(api_key=my_api_key)
     try:
         model = genai.GenerativeModel('gemini-pro')

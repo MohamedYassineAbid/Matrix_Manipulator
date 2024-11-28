@@ -20,7 +20,7 @@ def retrieve_data(File:str)->bytes:
 
 def show_account()->None:
 
-    __login__obj = __login__(auth_token="dk_prod_MK46VYMVP6M3VSM22AFF6JAX7R4F")
+    __login__obj = __login__(auth_token="your_token")
 
     LOGGED_IN = __login__obj.build_login_ui()
 
