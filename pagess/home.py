@@ -1,14 +1,16 @@
 from enum import Enum
-import os
 import time
 import streamlit as st
 import algorithmes
 import pandas as pd
 import numpy as np
 from streamlit_chat import message
-import creds
+#import creds
 import io
 import google.generativeai as genai
+from datetime import datetime
+import csv
+import json
 
 class MatrixType(Enum):
     SQUARE = "Square"
@@ -17,6 +19,9 @@ class MatrixType(Enum):
     BAND = "Band"
     IDENTITY = "Identity"
 
+class Dimension():
+    rows=0
+    cols=0
 
 class AlgorithmType(Enum):
     NONE = "None"
@@ -68,6 +73,9 @@ def download_csv(csv_content):
 def handle_resolution(matrix):
     st.write("### Provide Matrix B for AX = B:")
     rows, cols = matrix.shape
+    Dimension.rows=rows
+    Dimension.cols=cols
+    
     b_matrix = np.zeros((rows, 1))
     b_cols_input = st.columns(1)
     for i in range(rows):
@@ -137,7 +145,7 @@ def clear_matrix():
 
 
 def get_gemini_response(user_input):
-    my_api_key = creds.api_key2
+    my_api_key = "AIzaSyB4Kk2MHNPZlZD4JFiQoPEEICjZ2exNExY"
     genai.configure(api_key=my_api_key)
     try:
         model = genai.GenerativeModel('gemini-pro')
@@ -200,6 +208,8 @@ def handle_random_matrix_input():
     element_type = st.sidebar.radio("Select Element Type", ["int", "float"])
     matrix_type = st.sidebar.selectbox("Select Matrix Type", typeOfMatrix)
     rows = cols = st.sidebar.number_input("Matrix Size (n x n)", min_value=1, max_value=10, value=3)
+    Dimension.rows=rows
+    Dimension.cols=cols
 
     lower_bandwidth, upper_bandwidth = None, None
     yesorno = None
@@ -258,6 +268,8 @@ def handle_manual_input():
         rows = st.sidebar.number_input("Number of Rows", min_value=1, max_value=5, value=3)
         cols = st.sidebar.number_input("Number of Columns", min_value=1, max_value=5, value=3)
 
+    Dimension.rows=rows
+    Dimension.cols=cols
     st.write("### Enter Matrix Values")
 
     # Initialize matrix
@@ -298,6 +310,32 @@ def handle_manual_input():
     st.latex(matrix_to_latex(matrix))
 
 
+def save_the_matrix(result:str,algorithm_name:str)->None:
+    #download the matrix in matrices folder name:user_type_time
+    #open json file with the name of the username and append the matrix
+    date=datetime.now().strftime('%Y:%m:%d:%H:%M:%S')
+    date_replace=date.replace(':','_')
+    path=f"assets/token/matrices/{st.session_state['username']}_{algorithm_name}_{date_replace}.csv"
+    
+    new_matrix={
+        "Type": algorithm_name,
+        "Height": str(Dimension.rows),
+        "Width": str(Dimension.cols),
+        "Date": date,
+        "File": f"{st.session_state['username']}_{algorithm_name}_{date_replace}.csv"
+                }
+    np.savetxt(path,result,delimiter=',',fmt="%d")
+    
+    with open(f"assets/token/matrices/{st.session_state['username']}.json","r") as file:
+        data=json.load(file)
+    
+    with open(f"assets/token/matrices/{st.session_state['username']}.json","w") as file:
+        data.append(new_matrix)
+        json.dump(data,file)
+
+        
+
+
 
 
 def apply_and_display_algorithm(matrix, algorithm):
@@ -310,6 +348,8 @@ def apply_and_display_algorithm(matrix, algorithm):
                 if isinstance(result, np.ndarray):
                     st.latex(matrix_to_latex(result))
                     download_csv(save_matrix_to_csv(result))
+                    if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
+                         save_the_matrix(result,algorithm)
                 else:
                     st.write(f"#### {result}")
 
@@ -322,9 +362,13 @@ def apply_and_display_algorithm(matrix, algorithm):
             if result is not None:
                 if isinstance(result, np.ndarray):
                     download_csv(save_matrix_to_csv(result))
+                    if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
+                        save_the_matrix(result,algorithm)
 
                 else:
                     st.write(f"#### {result}")
+    
+
 
                     
 def show_home():

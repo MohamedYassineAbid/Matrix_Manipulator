@@ -1,6 +1,7 @@
 import streamlit as st
 import json
 import os
+import pandas as pd
 from streamlit_option_menu import option_menu
 from streamlit_cookies_manager import EncryptedCookieManager
 from utils.utils import check_usr_pass
@@ -14,6 +15,7 @@ from utils.utils import generate_random_passwd
 from utils.utils import send_passwd_in_email
 from utils.utils import change_passwd
 from utils.utils import check_current_passwd
+from utils.utils import retrieve_data
 
 
 class __login__:
@@ -29,8 +31,6 @@ class __login__:
         2. auth_token : The unique authorization token received from - https://www.courier.com/
         """
         self.auth_token = auth_token
-        # with open(self.lottie_url,'r') as file:
-        #     self.lottie_json = json.load(file)
         self.cookies = EncryptedCookieManager(
             prefix="streamlit_login_ui_yummy_cookies",
             password="9d68d6f2-4258-45c9-96eb-2d6bc74ddbb5-d8f49cab-edbb-404a-94d0-b25b1d4a564b",
@@ -101,6 +101,7 @@ class __login__:
 
                     else:
                         st.session_state["LOGGED_IN"] = True
+                        st.session_state["username"]=username
                         self.cookies["__streamlit_login_signup_ui_username__"] = (
                             username
                         )
@@ -269,7 +270,8 @@ class __login__:
 
             current_passwd = st.text_input(
                 "Current Password",
-                placeholder="Please enter the password you received in the email",
+                placeholder="Please enter the password",
+                type="password"
             )
             current_passwd_check = check_current_passwd(
                 email, current_passwd
@@ -366,7 +368,50 @@ class __login__:
                 },
             )
             return main_page_sidebar, selected_option,self.get_username().capitalize()
+
+
+    def show_history(self)->None:
+        """_summary_
+        """
+        st.title(f"{st.session_state['username'].capitalize()} History")
+        header=["Type","Height","Width","Time","File"]
+        with open(f'assets/token/matrices/{st.session_state["username"].lower()}.json','r') as file:
+            data=json.load(file)
+            res=[]
+            for record in data:
+                res.append(record.values())
+            res=pd.DataFrame(res,columns=header)
+            #st.table(res)
+
+
         
+        text_search = st.text_input("Search Matrix by Type or Date", value="")
+        m1=res['File'].str.contains(text_search.capitalize())
+        m2=res['Time'].str.contains(text_search.capitalize())
+        df_search=res[m1|m2]
+        nb_cards=3
+        if text_search:
+            for n_row,row in df_search.reset_index().iterrows():
+                i=n_row%nb_cards
+                if i==0:
+                    st.write("---")
+                    cols=st.columns(nb_cards,gap='large')
+                with cols[n_row%nb_cards]:
+                    st.caption(f"**{row['Time']}**")
+
+                    st.markdown(f"**{row['Type']}**")
+                    st.markdown(f"**Height = {row['Height']}**")
+                    st.markdown(f"**Width = {row['Width']}**")
+
+                    
+                    st.download_button(
+                        label="Download CSV",
+                        data=retrieve_data(row["File"]),
+                        file_name=row["File"],
+                        mime="text/csv",
+                        key=row["File"]
+                    )
+    
     
 
     def build_login_ui(self):
@@ -403,5 +448,7 @@ class __login__:
 
         if st.session_state["LOGGED_IN"] == True:
             main_page_sidebar.empty()
+            st.session_state["username"]=self.get_username()
+
 
         return st.session_state["LOGGED_IN"]

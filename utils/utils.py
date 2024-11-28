@@ -4,7 +4,8 @@ from trycourier import Courier
 import secrets
 from argon2 import PasswordHasher
 import requests
-
+from pandas import read_csv
+from io import StringIO
 
 ph = PasswordHasher()
 
@@ -139,6 +140,9 @@ def register_new_usr(
     with open("assets/token/_secret_auth_.json", "w") as auth_json_write:
         authorized_user_data.append(new_usr_data)
         json.dump(authorized_user_data, auth_json_write)
+    #new json folder to save matrices
+    with open(f"assets/token/matrices/{username_sign_up}.json","w")as csv:
+        json.dump(csv,[])
 
 
 def check_username_exists(user_name: str) -> bool:
@@ -242,3 +246,24 @@ def check_current_passwd(email_reset_passwd: str, current_passwd: str) -> bool:
                 except:
                     pass
     return False
+
+
+
+
+def retrieve_data(File:str)->bytes:
+    """
+    Retrieve Data From Local Storage
+
+    Args:
+        File (str): File Path
+
+    Returns:
+        bytes: Matrix Data in binary
+    """
+    with open(f"assets/token/matrices/{File}",'r') as file:
+        res=read_csv(file)
+        buffer = StringIO()
+        res.to_csv(buffer, index=False)
+        buffer.seek(0) 
+    return buffer.getvalue().encode()
+        
