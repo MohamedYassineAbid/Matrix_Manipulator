@@ -454,5 +454,8 @@ def cholesky_solve(matrix,algorithm)->None:
         if(isinstance(solution,np.ndarray) ): st.latex(matrix_to_latex(solution))
         else : st.write(f"#### {solution}")
         if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
-            save_the_matrix(solution,algorithm)
+            try:
+                save_the_matrix(solution,algorithm)
+            except:
+                pass
         return solution, [], []
