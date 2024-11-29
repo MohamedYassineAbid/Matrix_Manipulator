@@ -57,7 +57,7 @@ def save_matrix_to_csv(matrix):
     df = pd.DataFrame(matrix)
     
     buffer = io.StringIO()
-    df.to_csv(buffer, index=False)
+    df.to_csv(buffer, index=False,header=False)
     buffer.seek(0) 
     return buffer.getvalue() 
 
