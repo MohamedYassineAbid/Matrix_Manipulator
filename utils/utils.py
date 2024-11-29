@@ -142,7 +142,7 @@ def register_new_usr(
         json.dump(authorized_user_data, auth_json_write)
     #new json folder to save matrices
     with open(f"assets/token/matrices/{username_sign_up}.json","w")as csv:
-        json.dump(csv,[])
+        json.dump([],csv)
 
 
 def check_username_exists(user_name: str) -> bool:

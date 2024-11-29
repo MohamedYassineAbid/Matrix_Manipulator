@@ -367,7 +367,7 @@ class __login__:
                     },
                 },
             )
-            return main_page_sidebar, selected_option,self.get_username().capitalize()
+            return main_page_sidebar, selected_option
 
 
     def show_history(self)->None:
@@ -418,6 +418,7 @@ class __login__:
         """
         Brings everything together, calls important functions.
         """
+        
         if "LOGGED_IN" not in st.session_state:
             st.session_state["LOGGED_IN"] = False
 

@@ -145,7 +145,7 @@ def clear_matrix():
 
 
 def get_gemini_response(user_input):
-    my_api_key = creds.api_key2
+    my_api_key = creds.Gemini_API
     genai.configure(api_key=my_api_key)
     try:
         model = genai.GenerativeModel('gemini-pro')

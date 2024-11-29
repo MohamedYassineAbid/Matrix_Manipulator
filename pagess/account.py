@@ -10,13 +10,13 @@ import creds
 
 def show_account()->None:
 
-    __login__obj = __login__(auth_token=creds.api_key1)
+    __login__obj = __login__(auth_token=creds.Courier_API)
 
     LOGGED_IN = __login__obj.build_login_ui()
 
     if LOGGED_IN:
         
-        side_bar, selected_option,user = __login__obj.account_bar()
+        side_bar, selected_option = __login__obj.account_bar()
         if selected_option=="Profile":
             __login__obj.show_history()
                 
