@@ -399,7 +399,6 @@ def show_chatbot():
             else:
                 st.write(f"**MatX**: {message}")
                 
-                    
 def show_home():
     st.title("Matrix Operations")
     st.sidebar.header("Matrix Settings")
@@ -434,8 +433,26 @@ def show_home():
     algorithm = st.sidebar.selectbox("Choose an Algorithm", algorithm_type)
 
     # Apply and display the selected algorithm result
-    if st.session_state.matrix is not None:
+    if st.session_state.matrix is not None and algorithm != AlgorithmType.SOLVE_AXB.value:
         apply_and_display_algorithm(st.session_state.matrix, algorithm)
+    elif st.session_state.matrix is not None and algorithm == AlgorithmType.SOLVE_AXB.value:
+        cholesky_solve(st.session_state.matrix,algorithm)
         
+def cholesky_solve(matrix,algorithm)->None:
 
-    show_chatbot()
+    b_matrix = handle_resolution(matrix)
+    try:
+        if algorithmes.isSquare(matrix):
+            solution = algorithmes.resolution(matrix, b_matrix)
+        else:
+            return "Matrix A must be square to solve AX = B!", [], []
+    except np.linalg.LinAlgError as e:
+        return f"Error in solving AX = B: {e}", [], []
+    if st.button("Solve"):
+        st.write("### Solution of AX = B:")
+        
+        if(isinstance(solution,np.ndarray) ): st.latex(matrix_to_latex(solution))
+        else : st.write(f"#### {solution}")
+        if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
+            save_the_matrix(solution,algorithm)
+        return solution, [], []
