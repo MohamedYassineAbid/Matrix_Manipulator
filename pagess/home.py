@@ -440,9 +440,10 @@ def show_home():
         
 def cholesky_solve(matrix,algorithm)->None:
 
-    b_matrix = handle_resolution(matrix)
     try:
         if algorithmes.isSquare(matrix) and algorithmes.isSymmetric(matrix) and algorithmes.is_positive_definite(matrix):
+            b_matrix = handle_resolution(matrix)
+
             solution = algorithmes.resolution(matrix, b_matrix)
         else:
             return "Matrix A must be square to solve AX = B!", [], []
