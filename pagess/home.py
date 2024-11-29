@@ -147,9 +147,9 @@ def generate_random_matrix(matrix_type, rows, element_type, min_val, max_val, lo
         return algorithmes.generate_square_matrix(rows, element_type, min_val, max_val)
     elif matrix_type == MatrixType.SYMMETRIC.value:
         if yesorno == "No":
-            return algorithmes.generate_symmetric_matrix(rows, element_type, min_val, max_val)
+            return algorithmes.generate_symmetric_matrix(rows, element_type)
         else:
-            return algorithmes.generate_positive_definite_matrix(rows, element_type, min_val, max_val)
+            return algorithmes.generate_positive_definite_matrix(rows, element_type)
     elif matrix_type == MatrixType.DIAGONAL.value:
         return algorithmes.generate_diagonal_matrix(rows, element_type, min_val, max_val)
     elif matrix_type == MatrixType.BAND.value:
@@ -217,7 +217,7 @@ def handle_random_matrix_input():
         yesorno = st.sidebar.radio(
             "Do you want the matrix to be positive definite?", ["Yes", "No"]
         )
-    if matrix_type == MatrixType.IDENTITY.value:
+    if matrix_type == MatrixType.IDENTITY.value or matrix_type == MatrixType.SYMMETRIC.value:
         min_val = max_val = None        
         
     else :   
@@ -398,7 +398,28 @@ def show_chatbot():
                 st.write(f"**User**: {message}")
             else:
                 st.write(f"**MatX**: {message}")
-                
+def cholesky_solve(matrix,algorithm)->None:
+
+    try:
+        if algorithmes.isSquare(matrix) and algorithmes.isSymmetric(matrix) and algorithmes.is_positive_definite(matrix):
+            b_matrix = handle_resolution(matrix)
+
+            solution = algorithmes.resolution(matrix, b_matrix)
+        else:
+            return "Matrix A must be square to solve AX = B!", [], []
+    except np.linalg.LinAlgError as e:
+        return f"Error in solving AX = B: {e}", [], []
+    if st.button("Solve"):
+        st.write("### Solution of AX = B:")
+        
+        if(isinstance(solution,np.ndarray) ): st.latex(matrix_to_latex(solution))
+        else : st.write(f"#### {solution}")
+        if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
+            try:
+                save_the_matrix(solution,algorithm)
+            except:
+                pass
+        return solution, [], []               
 def show_home():
     st.title("Matrix Operations")
     st.sidebar.header("Matrix Settings")
@@ -437,26 +458,4 @@ def show_home():
         apply_and_display_algorithm(st.session_state.matrix, algorithm)
     elif st.session_state.matrix is not None and algorithm == AlgorithmType.SOLVE_AXB.value:
         cholesky_solve(st.session_state.matrix,algorithm)
-        
-def cholesky_solve(matrix,algorithm)->None:
-
-    try:
-        if algorithmes.isSquare(matrix) and algorithmes.isSymmetric(matrix) and algorithmes.is_positive_definite(matrix):
-            b_matrix = handle_resolution(matrix)
-
-            solution = algorithmes.resolution(matrix, b_matrix)
-        else:
-            return "Matrix A must be square to solve AX = B!", [], []
-    except np.linalg.LinAlgError as e:
-        return f"Error in solving AX = B: {e}", [], []
-    if st.button("Solve"):
-        st.write("### Solution of AX = B:")
-        
-        if(isinstance(solution,np.ndarray) ): st.latex(matrix_to_latex(solution))
-        else : st.write(f"#### {solution}")
-        if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
-            try:
-                save_the_matrix(solution,algorithm)
-            except:
-                pass
-        return solution, [], []
+    show_chatbot()    

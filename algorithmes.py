@@ -59,14 +59,14 @@ def resolution(L,b):
         sumj=0
         for j in range(i):
             sumj += L[i,j]*y[j]
-        y[i]=(b[i]-sumj)/L[i,i]
+        y[i] = (b[i] - np.dot(L[i, :i], y[:i])) / L[i, i]
 
     # Backward substitution  
     for i in range(n-1, -1, -1):
         sumj=0
         for j in range(i+1,n):
             sumj += U[i,j] * x[j]
-        x[i]=(y[i]-sumj)/U[i,i]
+        x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
     return x
         
 
@@ -75,12 +75,13 @@ type_mapping = {"int": int, "float": float}
 
 # Generate a symmetric matrix with specified value range
 
-def generate_symmetric_matrix(n, element_type, min_val, max_val):
+def generate_symmetric_matrix(n, element_type):
     # Initialize a square matrix of size n x n
     matrix = np.zeros((n, n))
-
+    min_val=-50
+    max_val=50
     for i in range(n):
-        for j in range(i, n):  
+        for j in range(i, n):
             random_value = random.randint(min_val, max_val)
             matrix[i][j] = random_value
             matrix[j][i] = random_value
@@ -88,7 +89,9 @@ def generate_symmetric_matrix(n, element_type, min_val, max_val):
 
 
 # Genetate a positive definite matrix
-def generate_positive_definite_matrix(n, element_type, min_val=0, max_val=10):
+def generate_positive_definite_matrix(n, element_type):
+    min_val=0
+    max_val=50
     random_matrix = np.random.uniform(min_val, max_val, (n, n))
 
     positive_definite_matrix = np.dot(random_matrix, random_matrix.T)
