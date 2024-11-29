@@ -43,31 +43,31 @@ def cholesky(A):
 
     return np.round(L, 2), np.round(steps, 2), descriptions
 # Resolution method for solving system of equations with message output instead of errors
-def resolution(A, b):
-    
-    A = np.array(A, dtype=float)
-    b = np.array(b, dtype=float)
-    n = A.shape[0]
-    
-    
-    # Step 1: Apply Gaussian elimination
-    U, error_msg = gauss_elimination(A)
-    if error_msg:
-        return error_msg  # Return the error message if singular matrix detected
-   
-    # Step 2: Back-substitution to solve for x
-    x = np.zeros(n)
-    for i in range(n-1, -1, -1):
-        if U[i, i] == 0:
-            return "Matrix is singular or nearly singular."
-        
-        x[i] = b[i]
-        for j in range(i+1, n):
-            x[i] -= U[i, j] * x[j]
-        x[i] /= U[i, i]
-    
-    return x
+def resolution(L,b):
+    L,_,_=cholesky(L)
+    b=b.copy()
+    L=np.array(L, float)
+    U=transposer(L)
+    b=np.array(b, float)
 
+    n,_=np.shape(L)
+    y=np.zeros(n)
+    x=np.zeros(n)
+
+    # Forward substitution
+    for i in range(n):
+        sumj=0
+        for j in range(i):
+            sumj += L[i,j]*y[j]
+        y[i]=(b[i]-sumj)/L[i,i]
+
+    # Backward substitution  
+    for i in range(n-1, -1, -1):
+        sumj=0
+        for j in range(i+1,n):
+            sumj += U[i,j] * x[j]
+        x[i]=(y[i]-sumj)/U[i,i]
+    return x
         
 
 
