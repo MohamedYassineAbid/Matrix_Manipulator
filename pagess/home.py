@@ -25,6 +25,8 @@ class Dimension():
 
 class AlgorithmType(Enum):
     NONE = "None"
+    profile = "profile"
+    
     TRANSPOSE = "Transpose"
     DETERMINANT = "Determinant"
     INVERSE = "Inverse"
@@ -74,6 +76,7 @@ def download_csv(csv_content):
 
 # Apply the chosen algorithm on the matrix
 def apply_algorithm(matrix, algorithm):
+    
     if algorithm == AlgorithmType.SOLVE_AXB.value:
         b_matrix = handle_resolution(matrix)
         try:
@@ -84,6 +87,8 @@ def apply_algorithm(matrix, algorithm):
                 return "Matrix A must be square to solve AX = B!", [], []
         except np.linalg.LinAlgError as e:
             return f"Error in solving AX = B: {e}", [], []
+    elif algorithm == AlgorithmType.profile.value:
+        return algorithmes.mat_profile(matrix), [], []
     elif algorithm == AlgorithmType.TRANSPOSE.value:
         return algorithmes.transposer(matrix), [], []
     elif algorithm == AlgorithmType.DETERMINANT.value:
@@ -212,8 +217,13 @@ def handle_random_matrix_input():
         yesorno = st.sidebar.radio(
             "Do you want the matrix to be positive definite?", ["Yes", "No"]
         )
-    min_val = col1.number_input("Min Value", value=0)
-    max_val = col2.number_input("Max Value", value=10)
+    if matrix_type == MatrixType.IDENTITY.value:
+        min_val = max_val = None        
+        
+    else :   
+        min_val = col1.number_input("Min Value", value=0)
+    
+        max_val = col2.number_input("Max Value", value=10)
     generate_button = st.sidebar.button("Generate Matrix")
 
     if generate_button:

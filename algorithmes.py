@@ -75,16 +75,15 @@ type_mapping = {"int": int, "float": float}
 
 # Generate a symmetric matrix with specified value range
 
-
 def generate_symmetric_matrix(n, element_type, min_val, max_val):
+    # Initialize a square matrix of size n x n
     matrix = np.zeros((n, n))
 
     for i in range(n):
-        for j in range(i, n):
+        for j in range(i, n):  
             random_value = random.randint(min_val, max_val)
             matrix[i][j] = random_value
             matrix[j][i] = random_value
-
     return np.round(matrix.astype(type_mapping[element_type]), 2)
 
 
@@ -117,9 +116,7 @@ def generate_identity_matrix(n):
 
 
 # Generate a band matrix with specified bandwidths and value range
-def generate_band_matrix(
-    n, element_type, lower_bandwidth, upper_bandwidth, low=0, high=10
-):
+def generate_band_matrix(n, element_type, lower_bandwidth, upper_bandwidth, low=0, high=10):
     A = np.zeros((n, n))
     # Fill the matrix with random values within the specified bandwidths
     for i in range(n):
@@ -159,7 +156,7 @@ def gauss_elimination(A):
         
         # If pivot element is zero, matrix is singular, return message
         if max_value == 0:
-            return A, "Matrix is singular or nearly singular."
+            return A, "Matrix is singular or nearly singular.(det=0)"
         
         if max_row != k:
             A[[k, max_row]] = A[[max_row, k]]
@@ -186,11 +183,18 @@ def Determinant(a):
     return np.prod(np.diag(a))
 
 
-def Inverse(matrix):
-    return (
-        (np.linalg.inv(matrix)) if Determinant(matrix) != 0 else ("Matrix is singular!")
-    )
-
+def Inverse(A):
+    n = A.shape[0]
+    augmented_matrix = np.hstack((A, np.eye(n)))
+    
+    U, error_msg = gauss_elimination(augmented_matrix)
+    
+    if error_msg:
+        return error_msg  
+    
+    inverse_matrix = U[:, n:]
+    
+    return inverse_matrix
 
 def transposer(matrix):
     return np.array([[row[i] for row in matrix] for i in range(len(matrix[0]))])
@@ -203,3 +207,41 @@ def isSymmetric(matrix):
 # check if the matrix is square
 def isSquare(matrix):
     return matrix.shape[0] == matrix.shape[1]
+
+def is_diagonal(matrix):
+    n = len(matrix) 
+    
+    for i in range(n):
+        for j in range(n):
+            if i != j and matrix[i][j] != 0:
+                return False  
+    
+    return True
+def is_identity(matrix):
+    n = len(matrix)
+    for i in range(n):
+        for j in range(n):
+            if i == j and matrix[i][j] != 1:
+                return False
+            if i != j and matrix[i][j] != 0:
+                return False
+    return True  
+
+def mat_profile(matrix):
+    profile = []
+    if isSquare(matrix):
+        profile.append("Square")
+        if isSymmetric(matrix):
+            profile.append("Symmetric")
+        else:
+            profile.append("Not Symmetric")
+        if is_identity(matrix) :
+            profile.append("Identity")
+        if is_diagonal(matrix) :
+            profile.append("Diagonal")
+        else:
+            profile.append("Not Diagonal")
+        
+    else :
+        profile.append("Not Square")
+    return profile
