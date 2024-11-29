@@ -70,17 +70,7 @@ def download_csv(csv_content):
         mime="text/csv",
     )
 
-def handle_resolution(matrix):
-    st.write("### Provide Matrix B for AX = B:")
-    rows, cols = matrix.shape
-    Dimension.rows=rows
-    Dimension.cols=cols
-    
-    b_matrix = np.zeros((rows, 1))
-    b_cols_input = st.columns(1)
-    for i in range(rows):
-        b_matrix[i][0] = b_cols_input[0].number_input(f"B[{i + 1}]", value=0.0,step=1.0)
-    return b_matrix
+
 
 # Apply the chosen algorithm on the matrix
 def apply_algorithm(matrix, algorithm):
@@ -144,38 +134,7 @@ def clear_matrix():
     st.rerun()
 
 
-def get_gemini_response(user_input):
-    my_api_key = creds.Gemini_API
-    genai.configure(api_key=my_api_key)
-    try:
-        model = genai.GenerativeModel('gemini-pro')
 
-        response = model.generate_content(user_input)
-
-        return response.text.strip()
-
-    except Exception as e:
-        return f"An error occurred: {str(e)}"
-
-# Streamlit UI for the chatbot
-def show_chatbot():
-    with st.sidebar.expander("💬 Chat with MatX "):
-        st.title("MatX Chatbot")
-
-        if "chat_history" not in st.session_state:
-            st.session_state.chat_history = []
-
-        user_input23 = st.text_input("Ask me anything about algebra or the World:", "")
-        if user_input23:
-            response = get_gemini_response(user_input23)
-            st.session_state.chat_history = [("User", user_input23), ("MatX", response)]
-
-        for speaker, message in st.session_state.chat_history:
-            if speaker == "User":
-                st.write(f"**User**: {message}")
-            else:
-                st.write(f"**MatX**: {message}")
-                
                 
 # Main function to render the Streamlit app
 def generate_random_matrix(matrix_type, rows, element_type, min_val, max_val, lower_bandwidth=None, upper_bandwidth=None, yesorno=None):
@@ -194,6 +153,37 @@ def generate_random_matrix(matrix_type, rows, element_type, min_val, max_val, lo
         return algorithmes.generate_identity_matrix(rows)
     return None
 
+def handle_resolution(matrix):
+    st.write("### Provide Matrix B for AX = B:")
+    rows, cols = matrix.shape
+    Dimension.rows=rows
+    Dimension.cols=cols
+    if (st.session_state.input_type == InputType.CSV_UPLOAD.value):
+        return handle_csv_b_input(rows)
+    else:
+        st.latex(matrix_to_latex(matrix))
+        return handle_manual_b_input(rows)
+    
+def handle_csv_b_input(rows):
+    st.write("### Upload a Matrix B File (CSV):")
+    uploaded_file = st.file_uploader("Upload another CSV file", type=["csv"], key="csv_file_uploader_2")
+    if uploaded_file is not None:
+        try:
+            df = pd.read_csv(uploaded_file, header=None)
+            if df.shape[0] != rows:
+                st.error("Number of rows in B matrix must match number of rows in A matrix!")
+                return None
+            return df.to_numpy()
+        except Exception as e:
+            st.error(f"Error reading file: {e}")
+            return None
+    return None
+def handle_manual_b_input(rows):
+    b_matrix = np.zeros((rows, 1))
+    b_cols_input = st.columns(1)
+    for i in range(rows):
+        b_matrix[i][0] = b_cols_input[0].number_input(f"B[{i + 1}]", value=0.0,step=1.0)
+    return b_matrix
 
 def handle_matrix_input(input_type):
     if input_type == InputType.RANDOM.value:
@@ -227,16 +217,14 @@ def handle_random_matrix_input():
     generate_button = st.sidebar.button("Generate Matrix")
 
     if generate_button:
-        with st.spinner('Generating random matrix...'):
-            time.sleep(0.5)  
-            matrix = generate_random_matrix(matrix_type, rows, element_type, min_val, max_val, lower_bandwidth, upper_bandwidth, yesorno)
-            st.session_state.matrix = matrix
-            st.latex(matrix_to_latex(matrix))
+        matrix = generate_random_matrix(matrix_type, rows, element_type, min_val, max_val, lower_bandwidth, upper_bandwidth, yesorno)
+        st.session_state.matrix = matrix
+        st.latex(matrix_to_latex(matrix))
 
 
 def handle_csv_upload():
     st.write("### Upload a Matrix File (CSV):")
-    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"], key="csv_file_uploader_1")
     if uploaded_file is not None:
         try:
             df = pd.read_csv(uploaded_file, header=None)
@@ -369,7 +357,38 @@ def apply_and_display_algorithm(matrix, algorithm):
                     st.write(f"#### {result}")
     
 
+def get_gemini_response(user_input):
+    my_api_key = creds.Gemini_API
+    genai.configure(api_key=my_api_key)
+    try:
+        model = genai.GenerativeModel('gemini-pro')
 
+        response = model.generate_content(user_input)
+
+        return response.text.strip()
+
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+
+# Streamlit UI for the chatbot
+def show_chatbot():
+    with st.sidebar.expander("💬 Chat with MatX "):
+        st.title("MatX Chatbot")
+
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
+
+        user_input23 = st.text_input("Ask me anything about algebra or the World:", "")
+        if user_input23:
+            response = get_gemini_response(user_input23)
+            st.session_state.chat_history = [("User", user_input23), ("MatX", response)]
+
+        for speaker, message in st.session_state.chat_history:
+            if speaker == "User":
+                st.write(f"**User**: {message}")
+            else:
+                st.write(f"**MatX**: {message}")
+                
                     
 def show_home():
     st.title("Matrix Operations")

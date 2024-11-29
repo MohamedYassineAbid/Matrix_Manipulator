@@ -1,2 +1,2 @@
-Gemini_API = "Your_Gemeni_API"
-Courier_API="Your_Courier_API"
+Gemini_API = "AIzaSyD6s2j56vnhOvM52M6aKr3tPxbrVS186Dk"
+Courier_API="dk_prod_MK46VYMVP6M3VSM22AFF6JAX7R4F"
