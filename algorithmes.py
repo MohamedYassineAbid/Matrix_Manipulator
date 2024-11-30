@@ -204,7 +204,10 @@ def transposer(matrix):
 
 
 def isSymmetric(matrix):
-    return np.all(matrix == transposer(matrix))
+    try:
+        return np.all(matrix == transposer(matrix))
+    except:
+        return False
 
 
 # check if the matrix is square
