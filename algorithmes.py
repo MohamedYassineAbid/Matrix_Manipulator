@@ -6,69 +6,56 @@ import numpy as np
 
 
 def cholesky(A):
-    """Performs a Cholesky decomposition of A, which must
-    be a symmetric and positive definite matrix. The function
-    returns the lower triangular matrix, L, along with the
-    steps and descriptions of the calculations."""
-    n = len(A)
-    L = np.zeros((n, n))
-    steps = []  
-    descriptions = []  
+    """Perform Cholesky decomposition of a symmetric positive-definite matrix A."""
+    A = np.copy(A)
+    n = A.shape[0]
+    L = np.zeros_like(A)
 
-    # Perform the Cholesky decomposition
-    for j in range(n):
-        L[j][j] = A[j][j]
-        
-        for k in range(j):
-            L[j][j] -= L[j][k] ** 2
-        
-        L[j][j] = sqrt(L[j][j])
-        for i in range(j + 1, n):
-            L[i][j] = A[i][j]
-            for k in range(j):
-                L[i][j] -= L[i][k] * L[j][k]
-            L[i][j] /= L[j][j]
-        steps.append(np.round(L, 2))
-        descriptions.append(
-            f"Step {j+1}: L_{j+1}{j+1} = {L[j][j]}\n"
-            + "".join(
-                [
-                    f"L_{i+1}{j+1} = {L[i][j]}\n"
-                    for i in range(j + 1, n)
-                ]
-            )
-        )
-        
-            
-
-    return np.round(L, 2), np.round(steps, 2), descriptions
-# Resolution method for solving system of equations with message output instead of errors
-def resolution(L,b):
-    L,_,_=cholesky(L)
-    b=b.copy()
-    L=np.array(L, float)
-    U=transposer(L)
-    b=np.array(b, float)
-
-    n,_=np.shape(L)
-    y=np.zeros(n)
-    x=np.zeros(n)
-
-    # Forward substitution
     for i in range(n):
-        sumj=0
-        for j in range(i):
-            sumj += L[i,j]*y[j]
-        y[i] = (b[i] - np.dot(L[i, :i], y[:i])) / L[i, i]
+        for j in range(i + 1):
+            sum_k = np.dot(L[i, :j], L[j, :j])
+            if i == j:  # Diagonal elements
+                L[i, j] = np.sqrt(A[i, i] - sum_k)
+            else:
+                L[i, j] = (A[i, j] - sum_k) / L[j, j]
 
-    # Backward substitution  
-    for i in range(n-1, -1, -1):
-        sumj=0
-        for j in range(i+1,n):
-            sumj += U[i,j] * x[j]
-        x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
+    return L,[],[]
+
+def forward_substitution(L, b):
+    """Solve Ly = b for y using forward substitution."""
+    L = np.copy(L)
+    b = np.copy(b)
+    n = len(b)
+    y = np.zeros(n)
+
+    for i in range(n):
+        sum_k = np.dot(L[i, :i], y[:i])
+        y[i] = (b[i] - sum_k) / L[i, i]
+
+    return y
+
+def back_substitution(U, y):
+    """Solve Ux = y for x using backward substitution."""
+    U = np.copy(U)
+    y = np.copy(y)
+    n = len(y)
+    x = np.zeros(n)
+
+    for i in range(n - 1, -1, -1):
+        sum_k = np.dot(U[i, i+1:], x[i+1:])
+        x[i] = (y[i] - sum_k) / U[i, i]
+
     return x
-        
+
+def resolution(A, b):
+    """Solve Ax = b using Cholesky decomposition."""
+    A = np.copy(A)
+    b = np.copy(b)
+
+    L = cholesky(A)
+    y = forward_substitution(L, b)
+    x = back_substitution(L.T, y)
+    return x
 
 
 type_mapping = {"int": int, "float": float}
@@ -204,7 +191,10 @@ def transposer(matrix):
 
 
 def isSymmetric(matrix):
-    return np.all(matrix == transposer(matrix))
+    try:
+        return np.all(matrix == transposer(matrix))
+    except:
+        return False
 
 
 # check if the matrix is square
