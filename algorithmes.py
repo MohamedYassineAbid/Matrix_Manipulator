@@ -72,11 +72,7 @@ def generate_band_matrix(n, element_type, lower_bandwidth, upper_bandwidth, low=
 # Cholesky decomposition algorithm
 
 
-def cholesky(A):
-    """Performs a Cholesky decomposition of A, which must
-    be a symmetric and positive definite matrix. The function
-    returns the lower triangular matrix, L, along with the
-    steps and descriptions of the calculations."""
+def cholesky_general(A):
     n = len(A)
     L = np.zeros((n, n))
     steps = []  
@@ -115,10 +111,32 @@ def cholesky(A):
                 ]
             )
         )
-        
-            
-
     return np.round(L, 2), np.round(steps, 2), descriptions
+
+def cholesky_optimized_diagonal(A):
+    n = len(A)
+    L = np.zeros((n, n))
+    steps = []
+    descriptions = []
+
+    # If the matrix is diagonal, we directly calculate the square root of diagonal elements
+    for i in range(n):
+        if A[i, i] <= 0:
+            return "Matrix is not positive definite.", [], []
+
+        L[i, i] = sqrt(A[i, i])  # Directly take the square root of diagonal elements
+
+    steps.append(np.round(L, 2))
+    descriptions.append(f"Cholesky decomposition for diagonal matrix: {np.round(L, 2)}")
+
+    return np.round(L, 2), steps, descriptions
+
+
+def cholesky(A):
+    if is_diagonal(A):
+        return cholesky_optimized_diagonal(A)  
+    else:
+        return cholesky_general(A)
 # Resolution method for solving system of equations with message output instead of errors
 def resolution(L,b):
     L,_,_=cholesky(L)
