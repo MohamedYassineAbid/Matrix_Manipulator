@@ -52,7 +52,7 @@ def matrix_to_latex(matrix):
 
 
 def save_matrix_to_csv(matrix):
-    df = pd.DataFrame(matrix)
+    df = pd.DataFrame(np.round(matrix, 2))
     
     buffer = io.StringIO()
     df.to_csv(buffer, index=False,header=False)
@@ -157,6 +157,8 @@ def generate_random_matrix(matrix_type, rows, element_type, min_val, max_val, lo
     return None
 
 def handle_resolution(matrix):
+    st.latex(matrix_to_latex(matrix))
+
     st.write("### Provide Matrix B for AX = B:")
     rows, cols = matrix.shape
     Dimension.rows=rows
@@ -227,7 +229,6 @@ def handle_random_matrix_input():
     if generate_button:
         matrix = generate_random_matrix(matrix_type, rows, element_type, min_val, max_val, lower_bandwidth, upper_bandwidth, yesorno)
         st.session_state.matrix = matrix
-        st.latex(matrix_to_latex(matrix))
 
 
 def handle_csv_upload():
@@ -303,7 +304,6 @@ def handle_manual_input():
 
     # Store and display matrix
     st.session_state.matrix = matrix
-    st.latex(matrix_to_latex(matrix))
 
 
 def save_the_matrix(result:str,algorithm_name:str)->None:
@@ -335,12 +335,15 @@ def save_the_matrix(result:str,algorithm_name:str)->None:
 
 
 def apply_and_display_algorithm(matrix, algorithm):
-    
+
     if algorithm != AlgorithmType.NONE.value :
+        if matrix is not None and st.session_state.input_type != InputType.CSV_UPLOAD.value:
+            st.latex(matrix_to_latex(matrix))
         st.write(f"### Result of {algorithm}:")
         result, steps, descriptions = apply_algorithm(matrix, algorithm)
         if (st.session_state.input_type != InputType.CSV_UPLOAD.value):
             if result is not None:
+                
                 if isinstance(result, np.ndarray):
                     st.latex(matrix_to_latex(result))
                     download_csv(save_matrix_to_csv(result))

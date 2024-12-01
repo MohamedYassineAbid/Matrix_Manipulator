@@ -147,9 +147,13 @@ import numpy as np
 
 # Gaussian elimination method with error message instead of raising errors
 def gauss_elimination(A):
-    A = A.copy()
+    # Ensure the matrix is of float type to avoid integer division issues
+    A = A.astype(float)
     n = A.shape[0]
+
+    # Forward elimination with partial pivoting
     for k in range(n-1):
+        # Find the row with the largest pivot element
         max_row = k
         max_value = abs(A[k, k])
         for i in range(k+1, n):
@@ -157,20 +161,21 @@ def gauss_elimination(A):
                 max_value = abs(A[i, k])
                 max_row = i
         
-        # If pivot element is zero, matrix is singular, return message
+        # If pivot element is zero, matrix is singular
         if max_value == 0:
-            return A, "Matrix is singular or nearly singular.(det=0)"
+            return None, "Matrix is singular or nearly singular (det=0)"
         
+        # Swap the rows
         if max_row != k:
             A[[k, max_row]] = A[[max_row, k]]
         
+        # Eliminate below pivot
         for i in range(k+1, n):
             if A[i, k] != 0.0:
                 factor = A[i, k] / A[k, k]
                 A[i, k:] -= factor * A[k, k:]
-    
-    return A, None  # Return None if no error
 
+    return A,None
 
 
 
