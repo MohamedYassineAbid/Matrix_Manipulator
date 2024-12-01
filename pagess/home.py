@@ -275,7 +275,7 @@ def handle_manual_input():
             cols_input = st.columns(cols)
             for j in range(cols):
                 matrix[i][j] = cols_input[j].number_input(
-                    f"Row {i + 1}, Col {j + 1}", value=0.0, step=1.0, key=f"custom_{i}_{j}"
+                    f"M[{i + 1}][{j + 1}]", value=0.0, step=1.0, key=f"custom_{i}_{j}"
                 )
 
     elif matrix_type == "Symmetric":
@@ -283,7 +283,7 @@ def handle_manual_input():
             cols_input = st.columns(cols)
             for j in range(i, cols):  
                 matrix[i][j] = cols_input[j].number_input(
-                    f"Row {i + 1}, Col {j + 1}", value=0.0, step=1.0, key=f"sym_{i}_{j}"
+                    f"M[{i + 1}][{j + 1}]", value=0.0, step=1.0, key=f"sym_{i}_{j}"
                 )
                 matrix[j][i] = matrix[i][j]  
 

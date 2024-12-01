@@ -103,10 +103,10 @@ def cholesky_general(A):
             
         steps.append(np.round(L, 2))
         descriptions.append(
-            f"Step {j+1}: L_{j+1}{j+1} = {L[j][j]}\n"
+            f"Step {j+1}: L_{j+1}{j+1} = {np.round(L[j][j],2)}\n"
             + "".join(
                 [
-                    f"L_{i+1}{j+1} = {L[i][j]}\n"
+                    f"L_{i+1}{j+1} = {np.round(L[i][j],2)}\n"
                     for i in range(j + 1, n)
                 ]
             )
@@ -129,7 +129,7 @@ def cholesky_optimized_diagonal(A):
     steps.append(np.round(L, 2))
     descriptions.append(f"Cholesky decomposition for diagonal matrix: {np.round(L, 2)}")
 
-    return np.round(L, 2), steps, descriptions
+    return np.round(L, 2), np.round(steps, 2), descriptions
 
 
 def cholesky(A):
