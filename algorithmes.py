@@ -67,7 +67,7 @@ def resolution(L,b):
         for j in range(i+1,n):
             sumj += U[i,j] * x[j]
         x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
-    return x
+    return np.round(x,4)
         
 
 

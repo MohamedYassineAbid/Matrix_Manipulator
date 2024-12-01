@@ -6,4 +6,4 @@ primaryColor="#4169e1"
 showErrorDetails = false
 
 [server]
-maxUploadSize = 7 
+maxUploadSize = 1 

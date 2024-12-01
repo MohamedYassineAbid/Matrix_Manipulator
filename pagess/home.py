@@ -320,7 +320,7 @@ def save_the_matrix(result:str,algorithm_name:str)->None:
         "Date": date,
         "File": f"{st.session_state['username']}_{algorithm_name}_{date_replace}.csv"
                 }
-    np.savetxt(path,result,delimiter=',',fmt="%d")
+    np.savetxt(path,result,delimiter=',',fmt="%4f")
     
     with open(f"assets/token/matrices/{st.session_state['username']}.json","r") as file:
         data=json.load(file)
@@ -341,6 +341,7 @@ def apply_and_display_algorithm(matrix, algorithm):
             st.latex(matrix_to_latex(matrix))
         st.write(f"### Result of {algorithm}:")
         result, steps, descriptions = apply_algorithm(matrix, algorithm)
+        np.round(result,4)
         if (st.session_state.input_type != InputType.CSV_UPLOAD.value):
             if result is not None:
                 
