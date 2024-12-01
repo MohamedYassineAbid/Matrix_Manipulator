@@ -135,15 +135,26 @@ def generate_band_matrix(n, element_type, lower_bandwidth, upper_bandwidth, low=
 
 
 # Matrix Minor
-def getMatrixMinor(m,i,j):
-    return [row[:j] + row[j+1:] for row in (m[:i]+m[i+1:])]
+def leading_principal_minors(matrix):
+    n = len(matrix)
+    minors = []
+    for k in range(1, n + 1):
+        submatrix = [row[:k] for row in matrix[:k]]  
+        minors.append(Determinant(np.array(submatrix)))
+    return minors
 
 
-
-# check if defined positive
 def is_positive_definite(matrix):
-    return np.all(np.linalg.eigvals(matrix) > 0)
-import numpy as np
+    
+    if not isSymmetric(matrix):
+        return False, "Matrix is not symmetric"
+    
+    minors = leading_principal_minors(matrix)
+    for minor in minors:
+        if minor <= 0:
+            return False, "Matrix is not positive definite"
+    
+    return True, None
 
 # Gaussian elimination method with error message instead of raising errors
 def gauss_elimination(A):
