@@ -4,7 +4,6 @@ import os
 import pandas as pd
 from streamlit_option_menu import option_menu
 from streamlit_cookies_manager import EncryptedCookieManager
-from streamlit_extras.stylable_container import stylable_container
 from utils.utils import check_usr_pass
 from utils.utils import check_valid_name
 from utils.utils import check_valid_email

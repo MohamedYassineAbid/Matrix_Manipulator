@@ -401,8 +401,9 @@ def cholesky_solve(matrix,algorithm)->None:
     try:
         if algorithmes.isSquare(matrix) and algorithmes.isSymmetric(matrix) and algorithmes.is_positive_definite(matrix):
             b_matrix = handle_resolution(matrix)
-
-            solution = algorithmes.resolution(matrix, b_matrix)
+            if(b_matrix is not None):
+                solution = algorithmes.resolution(matrix, b_matrix)
+            
         else:
             st.write("### Matrix A must be square,symmetric and postive define")
             return 
@@ -410,8 +411,11 @@ def cholesky_solve(matrix,algorithm)->None:
         st.write(f"Error in solving AX = B: {e}")
         return 
     if st.button("Solve"):
+        if b_matrix is None:
+            st.write('### Upload vector b')
+            return
+
         st.write("### Solution of AX = B:")
-        
         if(isinstance(solution,np.ndarray) ): st.latex(matrix_to_latex(solution))
         else : st.write(f"#### {solution}")
         if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
