@@ -2,6 +2,73 @@ from math import *
 import random
 import numpy as np
 
+
+        
+
+
+type_mapping = {"int": int, "float": float}
+
+# Generate a symmetric matrix with specified value range
+
+def generate_symmetric_matrix(n, element_type):
+    # Initialize a square matrix of size n x n
+    matrix = np.zeros((n, n))
+    min_val=-50
+    max_val=50
+    for i in range(n):
+        for j in range(i, n):
+            random_value = random.randint(min_val, max_val)
+            matrix[i][j] = random_value
+            matrix[j][i] = random_value
+    return np.round(matrix.astype(type_mapping[element_type]), 2)
+
+
+# Genetate a positive definite matrix
+def generate_positive_definite_matrix(n, element_type):
+    min_val=0
+    max_val=50
+    random_matrix = np.random.uniform(min_val, max_val, (n, n))
+
+    positive_definite_matrix = np.dot(random_matrix, random_matrix.T)
+
+    positive_definite_matrix = np.round(positive_definite_matrix, 2)
+    return positive_definite_matrix.astype(type_mapping[element_type])
+
+
+# Generate a diagonal matrix with specified value range
+def generate_diagonal_matrix(n, element_type, min_val, max_val):
+    diagonal_values = np.random.uniform(min_val, max_val, n)
+    return np.diag(np.round(diagonal_values, 2).astype(type_mapping[element_type]))
+
+
+# Generate a square matrix with specified value range
+def generate_square_matrix(n, element_type, min_val, max_val):
+    return np.round(np.random.uniform(min_val, max_val, (n, n)), 2).astype(
+        type_mapping[element_type]
+    )
+
+
+# Generate an identity matrix
+def generate_identity_matrix(n):
+    return np.identity(n).astype(int)
+
+
+# Generate a band matrix with specified bandwidths and value range
+def generate_band_matrix(n, element_type, lower_bandwidth, upper_bandwidth, low=0, high=10):
+    A = np.zeros((n, n))
+    # Fill the matrix with random values within the specified bandwidths
+    for i in range(n):
+        for j in range(max(0, i - lower_bandwidth), min(n, i + upper_bandwidth + 1)):
+            A[i, j] = float(np.round(np.random.uniform(low, high), 2))
+
+    return A.astype(type_mapping[element_type])
+
+
+################################################################################
+################################################################################
+################################################################################
+
+
 # Cholesky decomposition algorithm
 
 
@@ -78,71 +145,6 @@ def resolution(L,b):
             sumj += U[i,j] * x[j]
         x[i] = (y[i] - np.dot(U[i, i+1:], x[i+1:])) / U[i, i]
     return np.round(x,4)
-        
-
-
-type_mapping = {"int": int, "float": float}
-
-# Generate a symmetric matrix with specified value range
-
-def generate_symmetric_matrix(n, element_type):
-    # Initialize a square matrix of size n x n
-    matrix = np.zeros((n, n))
-    min_val=-50
-    max_val=50
-    for i in range(n):
-        for j in range(i, n):
-            random_value = random.randint(min_val, max_val)
-            matrix[i][j] = random_value
-            matrix[j][i] = random_value
-    return np.round(matrix.astype(type_mapping[element_type]), 2)
-
-
-# Genetate a positive definite matrix
-def generate_positive_definite_matrix(n, element_type):
-    min_val=0
-    max_val=50
-    random_matrix = np.random.uniform(min_val, max_val, (n, n))
-
-    positive_definite_matrix = np.dot(random_matrix, random_matrix.T)
-
-    positive_definite_matrix = np.round(positive_definite_matrix, 2)
-    return positive_definite_matrix.astype(type_mapping[element_type])
-
-
-# Generate a diagonal matrix with specified value range
-def generate_diagonal_matrix(n, element_type, min_val, max_val):
-    diagonal_values = np.random.uniform(min_val, max_val, n)
-    return np.diag(np.round(diagonal_values, 2).astype(type_mapping[element_type]))
-
-
-# Generate a square matrix with specified value range
-def generate_square_matrix(n, element_type, min_val, max_val):
-    return np.round(np.random.uniform(min_val, max_val, (n, n)), 2).astype(
-        type_mapping[element_type]
-    )
-
-
-# Generate an identity matrix
-def generate_identity_matrix(n):
-    return np.identity(n).astype(int)
-
-
-# Generate a band matrix with specified bandwidths and value range
-def generate_band_matrix(n, element_type, lower_bandwidth, upper_bandwidth, low=0, high=10):
-    A = np.zeros((n, n))
-    # Fill the matrix with random values within the specified bandwidths
-    for i in range(n):
-        for j in range(max(0, i - lower_bandwidth), min(n, i + upper_bandwidth + 1)):
-            A[i, j] = float(np.round(np.random.uniform(low, high), 2))
-
-    return A.astype(type_mapping[element_type])
-
-
-################################################################################
-################################################################################
-################################################################################
-
 
 # Matrix Minor
 def leading_principal_minors(matrix):
