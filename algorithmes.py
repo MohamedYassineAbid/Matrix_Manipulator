@@ -193,17 +193,28 @@ def Determinant(a):
 
 def Inverse(A):
     n = A.shape[0]
-    augmented_matrix = np.hstack((A, np.eye(n)))  # Augment A with the identity matrix
+    augmented_matrix = np.hstack((A.astype(float), np.eye(n)))
+    for k in range(n):
+        max_row = np.argmax(np.abs(augmented_matrix[k:n, k])) + k
+        if augmented_matrix[max_row, k] == 0:
+            return None, "Matrix is singular or nearly singular (det=0)"
+        
+        augmented_matrix[[k, max_row]] = augmented_matrix[[max_row, k]]
+        
+        augmented_matrix[k] /= augmented_matrix[k, k]
+        
+        for i in range(k+1, n):
+            factor = augmented_matrix[i, k]
+            augmented_matrix[i] -= factor * augmented_matrix[k]
     
-    # Perform Gaussian elimination
-    U, error_msg = gauss_elimination(augmented_matrix)
+    for k in range(n-1, -1, -1):
+        for i in range(k-1, -1, -1):
+            factor = augmented_matrix[i, k]
+            augmented_matrix[i] -= factor * augmented_matrix[k]
     
-    if error_msg:
-        return error_msg  # Return error message if matrix is singular
+    inverse_matrix = augmented_matrix[:, n:]
     
-    inverse_matrix = U[:, n:]  # Extract the inverse part
-    return inverse_matrix
-
+    return np.round(inverse_matrix, 5)
 def transposer(matrix):
     return np.array([[row[i] for row in matrix] for i in range(len(matrix[0]))])
 
