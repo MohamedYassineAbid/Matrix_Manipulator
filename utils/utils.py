@@ -261,9 +261,9 @@ def retrieve_data(File:str)->bytes:
         bytes: Matrix Data in binary
     """
     with open(f"assets/token/matrices/{File}",'r') as file:
-        res=read_csv(file)
+        res=read_csv(file,header=None)
         buffer = StringIO()
-        res.to_csv(buffer, index=False)
+        res.to_csv(buffer, index=False,header=False)
         buffer.seek(0) 
     return buffer.getvalue().encode()
         

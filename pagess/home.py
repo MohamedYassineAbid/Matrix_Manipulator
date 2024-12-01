@@ -318,7 +318,7 @@ def save_the_matrix(result:str,algorithm_name:str)->None:
         "Date": date,
         "File": f"{st.session_state['username']}_{algorithm_name}_{date_replace}.csv"
                 }
-    np.savetxt(path,result,delimiter=',',fmt="%4f")
+    np.savetxt(path,result,delimiter=',',fmt="%.4f")
     
     with open(f"assets/token/matrices/{st.session_state['username']}.json","r") as file:
         data=json.load(file)
