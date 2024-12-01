@@ -429,11 +429,9 @@ def cholesky_solve(matrix, algorithm):
                     except:
                         pass
         else:
-            # If input type is CSV, just display the result as text or table, not LaTeX
             if isinstance(solution, np.ndarray):
                 st.write(f"#### Solution matrix X:")
-                st.dataframe(solution)  # Display as a DataFrame table
-                # Convert result to CSV and show download button
+                #st.dataframe(solution) 
                 csv_content = save_matrix_to_csv(solution)
                 download_csv(csv_content)
                 if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
