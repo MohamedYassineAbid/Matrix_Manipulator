@@ -193,15 +193,15 @@ def Determinant(a):
 
 def Inverse(A):
     n = A.shape[0]
-    augmented_matrix = np.hstack((A, np.eye(n)))
+    augmented_matrix = np.hstack((A, np.eye(n)))  # Augment A with the identity matrix
     
+    # Perform Gaussian elimination
     U, error_msg = gauss_elimination(augmented_matrix)
     
     if error_msg:
-        return error_msg  
+        return error_msg  # Return error message if matrix is singular
     
-    inverse_matrix = U[:, n:]
-    
+    inverse_matrix = U[:, n:]  # Extract the inverse part
     return inverse_matrix
 
 def transposer(matrix):

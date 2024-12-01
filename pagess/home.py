@@ -157,8 +157,6 @@ def generate_random_matrix(matrix_type, rows, element_type, min_val, max_val, lo
     return None
 
 def handle_resolution(matrix):
-    st.latex(matrix_to_latex(matrix))
-
     st.write("### Provide Matrix B for AX = B:")
     rows, cols = matrix.shape
     Dimension.rows=rows
@@ -341,7 +339,6 @@ def apply_and_display_algorithm(matrix, algorithm):
             st.latex(matrix_to_latex(matrix))
         st.write(f"### Result of {algorithm}:")
         result, steps, descriptions = apply_algorithm(matrix, algorithm)
-        np.round(result,4)
         if (st.session_state.input_type != InputType.CSV_UPLOAD.value):
             if result is not None:
                 
@@ -400,34 +397,53 @@ def show_chatbot():
                 st.write(f"**User**: {message}")
             else:
                 st.write(f"**MatX**: {message}")
-def cholesky_solve(matrix,algorithm)->None:
-
+def cholesky_solve(matrix, algorithm):
     try:
         if algorithmes.isSquare(matrix) and algorithmes.isSymmetric(matrix) and algorithmes.is_positive_definite(matrix):
-            b_matrix = handle_resolution(matrix)
-            if(b_matrix is not None):
-                solution = algorithmes.resolution(matrix, b_matrix)
-            
+            b_matrix = handle_resolution(matrix)  # Get matrix B (for AX = B)
+            if b_matrix is not None:
+                solution = algorithmes.resolution(matrix, b_matrix)  # Solve AX = B
         else:
-            st.write("### Matrix A must be square,symmetric and postive define")
-            return 
+            st.write("### Matrix A must be square, symmetric, and positive definite")
+            return
     except np.linalg.LinAlgError as e:
         st.write(f"Error in solving AX = B: {e}")
-        return 
+        return
+
     if st.button("Solve"):
         if b_matrix is None:
             st.write('### Upload vector b')
             return
-
         st.write("### Solution of AX = B:")
-        if(isinstance(solution,np.ndarray) ): st.latex(matrix_to_latex(solution))
-        else : st.write(f"#### {solution}")
-        if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
-            try:
-                save_the_matrix(solution,algorithm)
-            except:
-                pass
-        return solution, [], []               
+        
+        # Only display the solution as LaTeX if the input type is not CSV
+        if st.session_state.input_type != InputType.CSV_UPLOAD.value:
+            if isinstance(solution, np.ndarray):
+                st.latex(matrix_to_latex(solution))
+                # Convert result to CSV and show download button
+                csv_content = save_matrix_to_csv(solution)
+                download_csv(csv_content)
+                if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
+                    try:
+                        save_the_matrix(solution, algorithm)
+                    except:
+                        pass
+        else:
+            # If input type is CSV, just display the result as text or table, not LaTeX
+            if isinstance(solution, np.ndarray):
+                st.write(f"#### Solution matrix X:")
+                st.dataframe(solution)  # Display as a DataFrame table
+                # Convert result to CSV and show download button
+                csv_content = save_matrix_to_csv(solution)
+                download_csv(csv_content)
+                if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
+                    try:
+                        save_the_matrix(solution, algorithm)
+                    except:
+                        pass
+            else:
+                st.write(f"#### {solution}")
+          
 def show_home():
     st.title("Matrix Operations")
     st.sidebar.header("Matrix Settings")
