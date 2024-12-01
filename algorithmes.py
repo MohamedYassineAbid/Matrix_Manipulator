@@ -22,7 +22,11 @@ def cholesky(A):
         for k in range(j):
             L[j][j] -= L[j][k] ** 2
         
-        L[j][j] = sqrt(L[j][j])
+        try:
+            L[j][j] = sqrt(L[j][j])
+        except ValueError as e:
+            return "Matrix is not positive definite.",[],[]
+
         for i in range(j + 1, n):
             L[i][j] = A[i][j]
             for k in range(j):
