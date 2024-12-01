@@ -331,13 +331,13 @@ class __login__:
                     "box-arrow-in-right",
                     "person-plus",
                     "x-circle",
-                    "arrow-counterclockwise",
+                    
                 ],
                 options=[
                     "Login",
                     "Create Account",
                     "Forgot Password?",
-                    "Reset Password",
+                    
                 ],
                 styles={
                     "container": {"padding": "5px"},
