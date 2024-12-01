@@ -4,6 +4,7 @@ import os
 import pandas as pd
 from streamlit_option_menu import option_menu
 from streamlit_cookies_manager import EncryptedCookieManager
+from streamlit_extras.stylable_container import stylable_container
 from utils.utils import check_usr_pass
 from utils.utils import check_valid_name
 from utils.utils import check_valid_email
@@ -390,8 +391,30 @@ class __login__:
         m2=res['Time'].str.contains(text_search.capitalize())
         df_search=res[m1|m2]
         nb_cards=3
-        if text_search:
+        if text_search!="":
             for n_row,row in df_search.reset_index().iterrows():
+                i=n_row%nb_cards
+                if i==0:
+                    st.write("---")
+                    cols=st.columns(nb_cards,gap='large')
+                with cols[n_row%nb_cards]:
+                    
+                    st.caption(f"**{row['Time']}**")
+
+                    st.markdown(f"**{row['Type']}**")
+                    st.markdown(f"**Height = {row['Height']}**")
+                    st.markdown(f"**Width = {row['Width']}**")
+
+                    
+                    st.download_button(
+                        label="Download CSV",
+                        data=retrieve_data(row["File"]),
+                        file_name=row["File"],
+                        mime="text/csv",
+                        key=row["File"]
+                    )
+        else:
+            for n_row,row in res.reset_index().iterrows():
                 i=n_row%nb_cards
                 if i==0:
                     st.write("---")
@@ -409,9 +432,9 @@ class __login__:
                         data=retrieve_data(row["File"]),
                         file_name=row["File"],
                         mime="text/csv",
-                        key=row["File"]
-                    )
-    
+                        key=row["File"])
+            
+
     
 
     def build_login_ui(self):

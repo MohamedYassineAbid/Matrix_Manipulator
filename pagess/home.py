@@ -1,5 +1,4 @@
 from enum import Enum
-import time
 import streamlit as st
 import algorithmes
 import pandas as pd
@@ -9,7 +8,6 @@ import creds as creds
 import io
 import google.generativeai as genai
 from datetime import datetime
-import csv
 import json
 
 class MatrixType(Enum):
@@ -32,7 +30,7 @@ class AlgorithmType(Enum):
     INVERSE = "Inverse"
     CHOLESKY = "Cholesky"
     POSITIVITY = "Positivity"
-    SOLVE_AXB = "Solve AX = B" 
+    CHOLESKY_RESOLUTION="Resolution" 
 
 
 class InputType(Enum):
@@ -77,7 +75,7 @@ def download_csv(csv_content):
 # Apply the chosen algorithm on the matrix
 def apply_algorithm(matrix, algorithm):
     
-    if algorithm == AlgorithmType.SOLVE_AXB.value:
+    if algorithm == AlgorithmType.CHOLESKY_RESOLUTION.value:
         b_matrix = handle_resolution(matrix)
         try:
             if algorithmes.isSquare(matrix):
@@ -406,9 +404,11 @@ def cholesky_solve(matrix,algorithm)->None:
 
             solution = algorithmes.resolution(matrix, b_matrix)
         else:
-            return "Matrix A must be square to solve AX = B!", [], []
+            st.write("### Matrix A must be square,symmetric and postive define")
+            return 
     except np.linalg.LinAlgError as e:
-        return f"Error in solving AX = B: {e}", [], []
+        st.write(f"Error in solving AX = B: {e}")
+        return 
     if st.button("Solve"):
         st.write("### Solution of AX = B:")
         
@@ -454,8 +454,8 @@ def show_home():
     algorithm = st.sidebar.selectbox("Choose an Algorithm", algorithm_type)
 
     # Apply and display the selected algorithm result
-    if st.session_state.matrix is not None and algorithm != AlgorithmType.SOLVE_AXB.value:
+    if st.session_state.matrix is not None and algorithm != AlgorithmType.CHOLESKY_RESOLUTION.value:
         apply_and_display_algorithm(st.session_state.matrix, algorithm)
-    elif st.session_state.matrix is not None and algorithm == AlgorithmType.SOLVE_AXB.value:
+    elif st.session_state.matrix is not None and algorithm == AlgorithmType.CHOLESKY_RESOLUTION.value:
         cholesky_solve(st.session_state.matrix,algorithm)
     show_chatbot()    
