@@ -31,7 +31,13 @@ def cholesky(A):
             L[i][j] = A[i][j]
             for k in range(j):
                 L[i][j] -= L[i][k] * L[j][k]
-            L[i][j] /= L[j][j]
+            try:
+                if L[j][j] == 0:
+                    return f"Division by zero encountered at L[{i+1}][{j+1}].",[],[]
+                L[i][j] /= L[j][j]
+            except ZeroDivisionError as e:
+                return str(e), [], []
+            
         steps.append(np.round(L, 2))
         descriptions.append(
             f"Step {j+1}: L_{j+1}{j+1} = {L[j][j]}\n"
