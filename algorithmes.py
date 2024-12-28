@@ -138,8 +138,9 @@ def cholesky(A):
     else:
         return cholesky_general(A)
 # Resolution method for solving system of equations with message output instead of errors
-def resolution(L,b):
-    L,_,_=cholesky(L)
+def resolution(L,b,raw=True):
+    if raw:
+        L,_,_=cholesky(L)
     b=b.copy()
     L=np.array(L, float)
     U=transposer(L)

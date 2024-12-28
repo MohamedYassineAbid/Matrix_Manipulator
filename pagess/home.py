@@ -355,17 +355,53 @@ def apply_and_display_algorithm(matrix, algorithm):
                     for step, description in zip(steps, descriptions):
                         st.write(description)
                         st.latex(matrix_to_latex(step))
-        elif (st.session_state.input_type == InputType.CSV_UPLOAD.value):
-            if result is not None:
-                if isinstance(result, np.ndarray):
-                    download_csv(save_matrix_to_csv(result))
-                    if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
-                        save_the_matrix(result,algorithm)
-
-                else:
-                    st.write(f"#### {result}")
+                    if st.button("Cholesky Resolution"):
+                        st.session_state.resol=True
+                    if("resol" in st.session_state and "fix" not in st.session_state and st.session_state.resol):
+                        b_matrix = handle_resolution(result)
+                    try:
+                        if b_matrix is not None:
+                            solution = algorithmes.resolution(result, b_matrix,raw=False)  # Solve AX = B
+                        if st.button("Solve"):
+                            if b_matrix is None:
+                                st.write('### Upload vector b')
+                                return
+                            st.write("### Solution of AX = B:")
+                        
+                            # Only display the solution as LaTeX if the input type is not CSV
+                            st.session_state.resol=False
+                            if st.session_state.input_type != InputType.CSV_UPLOAD.value:
+                                if isinstance(solution, np.ndarray):
+                                    st.latex(matrix_to_latex(solution))
+                                    # Convert result to CSV and show download button
+                                    csv_content = save_matrix_to_csv(solution)
+                                    download_csv(csv_content)
+                                    if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
+                                        try:
+                                            save_the_matrix(solution, algorithm)
+                                        except:
+                                            pass
+                            else:
+                                if isinstance(solution, np.ndarray):
+                                    st.write(f"#### Solution matrix X:")
+                                    #st.dataframe(solution) 
+                                    csv_content = save_matrix_to_csv(solution)
+                                    download_csv(csv_content)
+                                    if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
+                                        try:
+                                            save_the_matrix(solution, algorithm)
+                                        except:
+                                            pass
+                                else:
+                                    st.write(f"#### {solution}")
+                    except:
+                        pass
+                    print(st.session_state.resol)
+                
+            
     
 
+                
 def get_gemini_response(user_input):
     my_api_key = creds.Gemini_API
     genai.configure(api_key=my_api_key)
@@ -403,11 +439,12 @@ def cholesky_solve(matrix, algorithm):
             b_matrix = handle_resolution(matrix)  # Get matrix B (for AX = B)
             if b_matrix is not None:
                 solution = algorithmes.resolution(matrix, b_matrix)  # Solve AX = B
+                
         else:
             st.write("### Matrix A must be square, symmetric, and positive definite")
             return
-    except np.linalg.LinAlgError as e:
-        st.write(f"Error in solving AX = B: {e}")
+    except (np.linalg.LinAlgError,ValueError) as e:
+        st.error(f"Error in solving AX = B:")
         return
 
     if st.button("Solve"):
