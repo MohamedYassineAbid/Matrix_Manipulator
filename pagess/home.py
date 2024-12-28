@@ -396,7 +396,6 @@ def apply_and_display_algorithm(matrix, algorithm):
                                     st.write(f"#### {solution}")
                     except:
                         pass
-                    print(st.session_state.resol)
                 
             
     
