@@ -331,74 +331,77 @@ def save_the_matrix(result:str,algorithm_name:str)->None:
 
 
 
-
 def apply_and_display_algorithm(matrix, algorithm):
-
-    if algorithm != AlgorithmType.NONE.value :
-        if matrix is not None and st.session_state.input_type != InputType.CSV_UPLOAD.value:
+    if algorithm != AlgorithmType.NONE.value:
+        if st.session_state.input_type != InputType.CSV_UPLOAD.value:
+            st.write("### Matrix:")
             st.latex(matrix_to_latex(matrix))
+            
         st.write(f"### Result of {algorithm}:")
         result, steps, descriptions = apply_algorithm(matrix, algorithm)
-        if (st.session_state.input_type != InputType.CSV_UPLOAD.value):
-            if result is not None:
-                
-                if isinstance(result, np.ndarray):
+
+        if result is not None:
+            if isinstance(result, np.ndarray):
+                if st.session_state.input_type == InputType.CSV_UPLOAD.value:
+                    if algorithm == AlgorithmType.DETERMINANT.value:
+                        st.latex(matrix_to_latex(result))
+                    elif algorithm == AlgorithmType.CHOLESKY.value:
+                        # Prepare a CSV content with steps and descriptions
+                        csv_content = save_matrix_to_csv(result)
+                        csv_content += "\n### Steps of Cholesky Decomposition:\n"
+                        for step, description in zip(steps, descriptions):
+                            csv_content += f"{description}\n{matrix_to_latex(step)}\n"
+                        download_csv(csv_content)
+                        if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
+                            save_the_matrix(result, algorithm)
+                    else:
+                        download_csv(save_matrix_to_csv(result))
+                        if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
+                            save_the_matrix(result, algorithm)
+                else:
                     st.latex(matrix_to_latex(result))
                     download_csv(save_matrix_to_csv(result))
                     if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
-                         save_the_matrix(result,algorithm)
-                else:
-                    st.write(f"#### {result}")
+                        save_the_matrix(result, algorithm)
+            else:
+                st.write(f"#### {result}")
 
-                if algorithm == AlgorithmType.CHOLESKY.value and isinstance(result, np.ndarray):
+            if algorithm == AlgorithmType.CHOLESKY.value and isinstance(result, np.ndarray):
+                if st.session_state.input_type != InputType.CSV_UPLOAD.value:
                     st.write("### Steps of Cholesky Decomposition:")
                     for step, description in zip(steps, descriptions):
                         st.write(description)
                         st.latex(matrix_to_latex(step))
-                    if st.button("Cholesky Resolution"):
-                        st.session_state.resol=True
-                    if("resol" in st.session_state and "fix" not in st.session_state and st.session_state.resol):
-                        b_matrix = handle_resolution(result)
-                    try:
-                        if b_matrix is not None:
-                            solution = algorithmes.resolution(result, b_matrix,raw=False)  # Solve AX = B
-                        if st.button("Solve"):
-                            if b_matrix is None:
-                                st.write('### Upload vector b')
-                                return
-                            st.write("### Solution of AX = B:")
-                        
-                            # Only display the solution as LaTeX if the input type is not CSV
-                            st.session_state.resol=False
+                if st.button("Cholesky Resolution"):
+                    st.session_state.resol = True
+                if "resol" in st.session_state and "fix" not in st.session_state and st.session_state.resol:
+                    b_matrix = handle_resolution(result)
+                try:
+                    if b_matrix is not None:
+                        solution = algorithmes.resolution(result, b_matrix, raw=False)  # Solve AX = B
+                    if st.button("Solve"):
+                        if b_matrix is None:
+                            st.write('### Upload vector b')
+                            return
+                        st.write("### Solution of AX = B:")
+
+                        # Only display the solution as LaTeX if the input type is not CSV
+                        st.session_state.resol = False
+                        if isinstance(solution, np.ndarray):
                             if st.session_state.input_type != InputType.CSV_UPLOAD.value:
-                                if isinstance(solution, np.ndarray):
-                                    st.latex(matrix_to_latex(solution))
-                                    # Convert result to CSV and show download button
-                                    csv_content = save_matrix_to_csv(solution)
-                                    download_csv(csv_content)
-                                    if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
-                                        try:
-                                            save_the_matrix(solution, algorithm)
-                                        except:
-                                            pass
-                            else:
-                                if isinstance(solution, np.ndarray):
-                                    st.write(f"#### Solution matrix X:")
-                                    #st.dataframe(solution) 
-                                    csv_content = save_matrix_to_csv(solution)
-                                    download_csv(csv_content)
-                                    if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
-                                        try:
-                                            save_the_matrix(solution, algorithm)
-                                        except:
-                                            pass
-                                else:
-                                    st.write(f"#### {solution}")
-                    except:
-                        pass
-                
-            
-    
+                                st.latex(matrix_to_latex(solution))
+                            # Convert result to CSV and show download button
+                            csv_content = save_matrix_to_csv(solution)
+                            download_csv(csv_content)
+                            if "LOGGED_IN" in st.session_state and st.session_state["LOGGED_IN"]:
+                                try:
+                                    save_the_matrix(solution, algorithm)
+                                except:
+                                    pass
+                        else:
+                            st.write(f"#### {solution}")
+                except:
+                    pass
 
                 
 def get_gemini_response(user_input):
