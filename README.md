@@ -3,7 +3,7 @@
 
 Matrix Manipulator is a web application built with Python and Streamlit that enables users to perform various matrix operations. The app supports user login, matrix generation, manipulation, and allows users to view their operation history.
 [The online Website](https://matrixmanipulator.streamlit.app/)
-A Google Drive that conatains a series of videos showing different functionalities : [link](https://drive.google.com/drive/folders/1525Wje2cVol8hIw5MTvOj0EhGHlFQ0OS?usp=drive_link)
+A Google Drive that contains a series of videos showing different functionalities : [link](https://drive.google.com/drive/folders/1525Wje2cVol8hIw5MTvOj0EhGHlFQ0OS?usp=drive_link)
 ## Features
 
 - **User Authentication**: Login system for personalized sessions.
