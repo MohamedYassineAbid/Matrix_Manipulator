@@ -405,8 +405,7 @@ def apply_and_display_algorithm(matrix, algorithm):
 
                 
 def get_gemini_response(user_input):
-    my_api_key = st.secrets["api_key"]['g']     
-    
+    my_api_key = creds.Gemini_API
     genai.configure(api_key=my_api_key)
     try:
         model = genai.GenerativeModel('gemini-pro')
