@@ -23,7 +23,7 @@ A Google Drive that contains a series of videos showing different functionalitie
 1. Open a terminal window.
 2. Run the following command to clone the repository to your local machine:
    ```bash
-   git clone https://github.com/MohamedAliJmal/Matrix_Manipulator
+   git https://github.com/chameauu/Matrix_Manipulator.git
    ```
 3. Navigate into the project directory:
    ```bash
